@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using Utilities;
 
-namespace Managers
+namespace Ship
 {
     public class ShipPathManager : MonoBehaviour
     {
