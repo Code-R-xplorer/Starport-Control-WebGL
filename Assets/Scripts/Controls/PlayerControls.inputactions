@@ -1,0 +1,34 @@
+{
+    "name": "Controls",
+    "maps": [
+        {
+            "name": "Controls",
+            "id": "7ffaa278-0a03-499a-bb3e-ea227351e713",
+            "actions": [
+                {
+                    "name": "Primary",
+                    "type": "Button",
+                    "id": "192f2fe1-771c-4532-98cc-c21a1c49d350",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "2995dffe-5ed6-4bd1-ae9b-9d1aaa6e699a",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Primary",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
