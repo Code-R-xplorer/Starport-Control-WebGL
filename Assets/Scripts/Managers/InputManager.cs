@@ -1,4 +1,5 @@
-﻿using Controls;
+﻿using System;
+using Controls;
 using UnityEngine;
 
 namespace Managers
@@ -10,6 +11,8 @@ namespace Managers
         
         public delegate void BaseAction();
         public delegate void BoolBaseAction(bool canceled);
+        
+        public Vector2 Position { get; private set; }
 
         public event BoolBaseAction OnPrimary;
 
@@ -23,6 +26,11 @@ namespace Managers
         {
             _playerControls.Controls.Primary.started += context => { OnPrimary?.Invoke(context.canceled); };
             _playerControls.Controls.Primary.canceled += context => { OnPrimary?.Invoke(context.canceled); };
+        }
+
+        private void Update()
+        {
+            Position = _playerControls.Controls.Position.ReadValue<Vector2>();
         }
 
         private void OnEnable()

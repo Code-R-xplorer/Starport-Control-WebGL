@@ -37,6 +37,15 @@ namespace Controls
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Position"",
+                    ""type"": ""Value"",
+                    ""id"": ""0d11add4-cc8b-438f-afbd-8577b704e0bc"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -50,6 +59,17 @@ namespace Controls
                     ""action"": ""Primary"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2c3fbc38-ab96-4200-9825-9b984c609a60"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Position"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -59,6 +79,7 @@ namespace Controls
             // Controls
             m_Controls = asset.FindActionMap("Controls", throwIfNotFound: true);
             m_Controls_Primary = m_Controls.FindAction("Primary", throwIfNotFound: true);
+            m_Controls_Position = m_Controls.FindAction("Position", throwIfNotFound: true);
         }
 
         public void Dispose()
@@ -121,11 +142,13 @@ namespace Controls
         private readonly InputActionMap m_Controls;
         private List<IControlsActions> m_ControlsActionsCallbackInterfaces = new List<IControlsActions>();
         private readonly InputAction m_Controls_Primary;
+        private readonly InputAction m_Controls_Position;
         public struct ControlsActions
         {
             private @PlayerControls m_Wrapper;
             public ControlsActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
             public InputAction @Primary => m_Wrapper.m_Controls_Primary;
+            public InputAction @Position => m_Wrapper.m_Controls_Position;
             public InputActionMap Get() { return m_Wrapper.m_Controls; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -138,6 +161,9 @@ namespace Controls
                 @Primary.started += instance.OnPrimary;
                 @Primary.performed += instance.OnPrimary;
                 @Primary.canceled += instance.OnPrimary;
+                @Position.started += instance.OnPosition;
+                @Position.performed += instance.OnPosition;
+                @Position.canceled += instance.OnPosition;
             }
 
             private void UnregisterCallbacks(IControlsActions instance)
@@ -145,6 +171,9 @@ namespace Controls
                 @Primary.started -= instance.OnPrimary;
                 @Primary.performed -= instance.OnPrimary;
                 @Primary.canceled -= instance.OnPrimary;
+                @Position.started -= instance.OnPosition;
+                @Position.performed -= instance.OnPosition;
+                @Position.canceled -= instance.OnPosition;
             }
 
             public void RemoveCallbacks(IControlsActions instance)
@@ -165,6 +194,7 @@ namespace Controls
         public interface IControlsActions
         {
             void OnPrimary(InputAction.CallbackContext context);
+            void OnPosition(InputAction.CallbackContext context);
         }
     }
 }
