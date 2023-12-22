@@ -18,6 +18,7 @@ namespace Ship
         private Vector3 _currentPoint;
         private bool _usePath;
         private bool _landed;
+        private bool _spawned = true;
 
         private ShipAnimation _shipAnimation;
         
@@ -27,6 +28,7 @@ namespace Ship
             _lineRenderer = GetComponent<LineRenderer>();
             _shipAnimation = GetComponent<ShipAnimation>();
             _shipAnimation.OnAnimationFinished += DestroyShip;
+            transform.up = Vector3.zero - transform.position; 
         }
 
         private void FixedUpdate()
@@ -108,6 +110,11 @@ namespace Ship
 
         void OnBecameInvisible()
         {
+            if (_spawned)
+            {
+                _spawned = false;
+                return;
+            }
             Debug.Log("Out of View");
             // var rot = transform.rotation;
             var randX = Random.Range(-0.5f, 0.5f);
