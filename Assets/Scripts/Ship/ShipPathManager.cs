@@ -11,7 +11,7 @@ namespace Ship
         private bool _recordPath;
         private Camera _camera;
 
-        private Ship _selectedShip;
+        private ShipController _selectedShipController;
         
         private void Start()
         {
@@ -27,7 +27,7 @@ namespace Ship
             {
                 var pos = _camera.ScreenToWorldPoint(InputManager.Instance.Position);
                 pos.z = 0;
-                _selectedShip.AddPathPoint(pos);
+                _selectedShipController.AddPathPoint(pos);
                 _currentRecordInterval = recordInterval;
             }
         }
@@ -48,8 +48,8 @@ namespace Ship
                     _currentRecordInterval = recordInterval;
                     var pos = _camera.ScreenToWorldPoint(InputManager.Instance.Position);
                     pos.z = 0;
-                    _selectedShip = rayHit.transform.GetComponent<Ship>();
-                    _selectedShip.StartPath(pos);
+                    _selectedShipController = rayHit.transform.GetComponent<ShipController>();
+                    _selectedShipController.StartPath(pos);
                 }
                 else
                 {
@@ -62,7 +62,7 @@ namespace Ship
                 _recordPath = false;
                 var pos = _camera.ScreenToWorldPoint(InputManager.Instance.Position);
                 pos.z = 0;
-                _selectedShip.AddPathPoint(pos);
+                _selectedShipController.AddPathPoint(pos);
                 
             }
         }
