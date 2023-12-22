@@ -1,8 +1,8 @@
 ﻿namespace Utilities
 {
-    public class Tags
+    public static class Tags
     {
-        public static readonly string Pad = "Pad";
-        public static readonly string Ship = "Ship";
+        public const string Pad = "Pad";
+        public const string Ship = "Ship";
     }
 }

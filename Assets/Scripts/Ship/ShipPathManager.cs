@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Utilities;
 
 namespace Ship
@@ -11,33 +9,26 @@ namespace Ship
 
         private float _currentRecordInterval;
         private bool _recordPath;
-        private LineRenderer _lineRenderer;
-        
-        private List<Vector3> _currentPathPoints;
         private Camera _camera;
+
+        private Ship _selectedShip;
         
         private void Start()
         {
             InputManager.Instance.OnPrimary += RecordPath;
             _camera = Camera.main;
-            _lineRenderer = GetComponent<LineRenderer>();
         }
 
         private void Update()
         {
-            if (_recordPath)
+            if (!_recordPath) return;
+            _currentRecordInterval -= Time.deltaTime;
+            if (_currentRecordInterval <= 0)
             {
-                _currentRecordInterval -= Time.deltaTime;
-                if (_currentRecordInterval <= 0)
-                {
-                    var pos = _camera.ScreenToWorldPoint(InputManager.Instance.Position);
-                    pos.z = 0;
-                    _currentPathPoints.Add(pos);
-                    _lineRenderer.positionCount++;
-                    _lineRenderer.SetPositions(_currentPathPoints.ToArray());
-                    _currentRecordInterval = recordInterval;
-                }
-                
+                var pos = _camera.ScreenToWorldPoint(InputManager.Instance.Position);
+                pos.z = 0;
+                _selectedShip.AddPathPoint(pos);
+                _currentRecordInterval = recordInterval;
             }
         }
 
@@ -55,12 +46,10 @@ namespace Ship
                 {
                     _recordPath = true;
                     _currentRecordInterval = recordInterval;
-                    _currentPathPoints = new List<Vector3>();
                     var pos = _camera.ScreenToWorldPoint(InputManager.Instance.Position);
                     pos.z = 0;
-                    _currentPathPoints.Add(pos);
-                    _lineRenderer.positionCount = 1;
-                    _lineRenderer.SetPositions(_currentPathPoints.ToArray());
+                    _selectedShip = rayHit.transform.GetComponent<Ship>();
+                    _selectedShip.StartPath(pos);
                 }
                 else
                 {
@@ -69,16 +58,12 @@ namespace Ship
             }
             else
             {
-                if (!_recordPath)
-                {
-                    _lineRenderer.SetPositions(Array.Empty<Vector3>());
-                    _lineRenderer.positionCount = 0;
-                    return;
-                }
+                if (!_recordPath) return;
                 _recordPath = false;
-                _currentPathPoints.Add(InputManager.Instance.Position);
-                // Assign path to ship logic here
-
+                var pos = _camera.ScreenToWorldPoint(InputManager.Instance.Position);
+                pos.z = 0;
+                _selectedShip.AddPathPoint(pos);
+                
             }
         }
     }
