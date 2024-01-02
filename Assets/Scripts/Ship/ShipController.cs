@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Managers;
 using UnityEngine;
 using Utilities;
 using Random = UnityEngine.Random;
@@ -88,6 +89,7 @@ namespace Ship
             {
                 Debug.Log("Collided with other ship");
                 // Ship collision logic here
+                GameManager.Instance.GameOver();
             }
 
             if (other.collider.CompareTag(Tags.Pad))
@@ -100,6 +102,7 @@ namespace Ship
                 _lineRenderer.SetPositions(Array.Empty<Vector3>());
                 _lineRenderer.positionCount = 0;
                 _shipAnimation.PlayLandingAnimation();
+                GameManager.Instance.ShipLanded();
             }
         }
 

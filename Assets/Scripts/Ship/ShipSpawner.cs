@@ -16,10 +16,12 @@ namespace Ship
             _camera = Camera.main;
         }
 
-        private void SpawnShip()
+        public void SpawnShip()
         {
             _ship = ships[Random.Range(0, ships.Count)];
-            switch (Random.Range(0,4))
+            var r = Random.Range(0, 4);
+            Debug.Log(r);
+            switch (r)
             {
                 case 0:
                     SpawnAtTopEdge();
