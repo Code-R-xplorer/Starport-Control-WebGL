@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Managers;
 using UnityEngine;
+using Utilities;
 using Random = UnityEngine.Random;
 
 namespace Ship
@@ -11,9 +13,51 @@ namespace Ship
         private GameObject _ship;
         private Camera _camera;
 
+        private bool _canSpawnShip;
+        
+        private float _currentTimeBetweenSpawns;
+        private bool _canSpawnShips;
+        private int _totalShipsToSpawn;
+        private float _timeBetweenSpawns;
+
         private void Start()
         {
             _camera = Camera.main;
+        }
+
+        public void SetupSpawner(int totalShips, float timeBetweenSpawns)
+        {
+            _totalShipsToSpawn = totalShips;
+            _timeBetweenSpawns = timeBetweenSpawns;
+            _currentTimeBetweenSpawns = _timeBetweenSpawns;
+            _canSpawnShips = true;
+            _canSpawnShip = true;
+            UIManager.Instance.hud.UpdateInfo(inboundShips: _totalShipsToSpawn);
+        }
+
+        public void StopSpawningShips()
+        {
+            _canSpawnShips = false;
+        }
+
+        private void Update()
+        {
+            if (_canSpawnShips)
+            {
+                if(!_canSpawnShip) return;
+                if (_totalShipsToSpawn != 0)
+                {
+                    _currentTimeBetweenSpawns -= Time.deltaTime;
+                    if (_currentTimeBetweenSpawns <= 0)
+                    {
+                        SpawnShip();
+                        _totalShipsToSpawn--;
+                        _currentTimeBetweenSpawns = _timeBetweenSpawns;
+                        UIManager.Instance.hud.UpdateInfo(inboundShips: _totalShipsToSpawn);
+                    }
+                }
+                else _canSpawnShips = false;
+            }
         }
 
         public void SpawnShip()
@@ -80,6 +124,26 @@ namespace Ship
             spawnPosition.x += Random.Range(0f, 1f);
 
             Instantiate(_ship, spawnPosition, Quaternion.identity);
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if(!other.CompareTag(Tags.Ship)) return;
+            _canSpawnShip = false;
+
+        }
+
+        private void OnTriggerStay2D(Collider2D other)
+        {
+            if(!other.CompareTag(Tags.Ship)) return;
+            _canSpawnShip = false;
+        }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            if(!other.CompareTag(Tags.Ship)) return;
+            _currentTimeBetweenSpawns = _timeBetweenSpawns;
+            _canSpawnShip = true;
         }
     }
 }

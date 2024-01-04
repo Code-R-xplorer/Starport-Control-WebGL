@@ -246,7 +246,7 @@ AnimationClip:
   m_Events:
   - time: 1
     functionName: AnimationFinished
-    data: 
+    data: Landing
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0

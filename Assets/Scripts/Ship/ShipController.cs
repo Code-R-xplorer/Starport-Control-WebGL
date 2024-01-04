@@ -10,6 +10,8 @@ namespace Ship
 {
     public class ShipController : MonoBehaviour
     {
+        [SerializeField] private GameObject indicator;
+        [SerializeField] private GameObject tooCloseAlert;
         [SerializeField] private float speed;
 
         private Rigidbody2D _rigidbody;
@@ -20,6 +22,7 @@ namespace Ship
         private bool _usePath;
         private bool _landed;
         private bool _spawned = true;
+        private bool _canFly; 
 
         private ShipAnimation _shipAnimation;
         
@@ -28,13 +31,18 @@ namespace Ship
             _rigidbody = GetComponent<Rigidbody2D>();
             _lineRenderer = GetComponent<LineRenderer>();
             _shipAnimation = GetComponent<ShipAnimation>();
-            _shipAnimation.OnAnimationFinished += DestroyShip;
+            _shipAnimation.OnLandingFinished += DestroyShip;
+            _shipAnimation.OnIndicatorFinished += () =>
+            {
+                Destroy(indicator);
+                _canFly = true;
+            };
             transform.up = Vector3.zero - transform.position; 
         }
 
         private void FixedUpdate()
         {
-            if(_landed) return;
+            if(_landed || !_canFly) return;
             _rigidbody.velocity = transform.up * (speed * Time.deltaTime);
             if(!_usePath) return;
             _path[0] = transform.position;
@@ -84,7 +92,6 @@ namespace Ship
 
         private void OnCollisionEnter2D(Collision2D other)
         {
-            Debug.Log(other.transform.name);
             if (other.collider.CompareTag(Tags.Ship))
             {
                 Debug.Log("Collided with other ship");
@@ -102,12 +109,24 @@ namespace Ship
                 _lineRenderer.SetPositions(Array.Empty<Vector3>());
                 _lineRenderer.positionCount = 0;
                 _shipAnimation.PlayLandingAnimation();
-                GameManager.Instance.ShipLanded();
             }
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if(!other.CompareTag(Tags.Ship)) return;
+            tooCloseAlert.SetActive(true);
+        }
+        
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            if(!other.CompareTag(Tags.Ship)) return;
+            tooCloseAlert.SetActive(false);
         }
 
         private void DestroyShip()
         {
+            GameManager.Instance.ShipLanded();
             Destroy(gameObject);
         }
 

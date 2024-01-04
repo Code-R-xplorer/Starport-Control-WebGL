@@ -13,14 +13,13 @@ namespace Managers
 
         [SerializeField] private ShipSpawner shipSpawner;
 
-        public int ShipsLanded { get; private set; }
+        private int _shipsLanded;
         private float _currentTimeBetweenSpawns;
-        private bool _canSpawnShips = true;
 
         private int _spawnedShips;
 
-        public event Action onGameWin;
-        public event Action onGameOver;
+        public event Action<int> onGameWin;
+        public event Action<int> onGameOver;
 
         private void Awake()
         {
@@ -29,32 +28,15 @@ namespace Managers
 
         private void Start()
         {
-            _currentTimeBetweenSpawns = timeBetweenSpawns;
-        }
-
-        private void Update()
-        {
-            if (_canSpawnShips)
-            {
-                if (_spawnedShips < totalShipsToSpawn)
-                {
-                    _currentTimeBetweenSpawns -= Time.deltaTime;
-                    if (_currentTimeBetweenSpawns <= 0)
-                    {
-                        shipSpawner.SpawnShip();
-                        _spawnedShips++;
-                        _currentTimeBetweenSpawns = timeBetweenSpawns;
-                    }
-                }
-                else _canSpawnShips = false;
-            }
+            shipSpawner.SetupSpawner(totalShipsToSpawn, timeBetweenSpawns);
         }
 
         public void ShipLanded()
         {
-            ShipsLanded++;
+            _shipsLanded++;
+            UIManager.Instance.hud.UpdateInfo(shipsLanded: _shipsLanded);
 
-            if (ShipsLanded == totalShipsToSpawn) GameWin();
+            if (_shipsLanded == totalShipsToSpawn) GameWin();
         }
 
         private void GameWin()
@@ -62,15 +44,17 @@ namespace Managers
             // Show Game Win UI
             // Stop the game
             
-            onGameWin?.Invoke();
+            onGameWin?.Invoke(_shipsLanded);
+            Time.timeScale = 0f;
         }
 
         public void GameOver()
         {
             // Show Game Over UI
             // Stop the game
-            _canSpawnShips = false;
-            onGameOver?.Invoke();
+            shipSpawner.StopSpawningShips();
+            onGameOver?.Invoke(_shipsLanded);
+            Time.timeScale = 0f;
         }
     }
 }

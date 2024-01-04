@@ -8,12 +8,15 @@ namespace Ship
     {
         private Animator _animator;
         private static readonly int ShipLand = Animator.StringToHash("ShipLand");
+        private static readonly int HideIndicator = Animator.StringToHash("HideIndicator");
 
-        public event InputManager.BaseAction OnAnimationFinished;
+        public event Action OnLandingFinished;
+        public event Action OnIndicatorFinished;
 
         private void Start()
         {
             _animator = GetComponent<Animator>();
+            _animator.Play(HideIndicator, -1, 0f);
         }
 
         public void PlayLandingAnimation()
@@ -21,9 +24,17 @@ namespace Ship
             _animator.Play(ShipLand, -1, 0f);
         }
 
-        public void AnimationFinished()
+        public void AnimationFinished(string input)
         {
-            OnAnimationFinished?.Invoke();
+            switch (input)
+            {
+                case "Landing":
+                    OnLandingFinished?.Invoke();
+                    break;
+                case "Indicator":
+                    OnIndicatorFinished?.Invoke();
+                    break;
+            }
         }
     }
 }
