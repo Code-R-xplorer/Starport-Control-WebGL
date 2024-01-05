@@ -31,13 +31,19 @@ namespace Managers
             shipSpawner.SetupSpawner(totalShipsToSpawn, timeBetweenSpawns);
         }
 
-        public void ShipLanded()
+        public void ShipLanded(bool vip)
         {
+            if(!vip && shipSpawner.VipSpawned) GameOver();
+            if (vip)
+            {
+                shipSpawner.VipLanded();
+            }
             _shipsLanded++;
             UIManager.Instance.hud.UpdateInfo(shipsLanded: _shipsLanded);
 
             if (_shipsLanded == totalShipsToSpawn) GameWin();
         }
+
 
         private void GameWin()
         {

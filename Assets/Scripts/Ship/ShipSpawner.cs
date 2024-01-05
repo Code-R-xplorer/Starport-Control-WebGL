@@ -20,6 +20,10 @@ namespace Ship
         private int _totalShipsToSpawn;
         private float _timeBetweenSpawns;
 
+        private bool _canSpawnVip = true;
+        
+        public bool VipSpawned { get; private set; }
+
         private void Start()
         {
             _camera = Camera.main;
@@ -60,11 +64,23 @@ namespace Ship
             }
         }
 
-        public void SpawnShip()
+        private void SpawnShip()
         {
             _ship = ships[Random.Range(0, ships.Count)];
+            if (_ship.name == "VIP_Ship")
+            {
+                if (_canSpawnVip)
+                {
+                    _canSpawnVip = false;
+                    VipSpawned = true;
+                }
+                else
+                {
+                    SpawnShip();
+                    return;
+                }
+            }
             var r = Random.Range(0, 4);
-            Debug.Log(r);
             switch (r)
             {
                 case 0:
@@ -144,6 +160,12 @@ namespace Ship
             if(!other.CompareTag(Tags.Ship)) return;
             _currentTimeBetweenSpawns = _timeBetweenSpawns;
             _canSpawnShip = true;
+        }
+
+        public void VipLanded()
+        {
+            _canSpawnVip = true;
+            VipSpawned = false;
         }
     }
 }

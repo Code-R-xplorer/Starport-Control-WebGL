@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Managers;
 using UnityEngine;
 using Utilities;
@@ -12,7 +13,14 @@ namespace Ship
     {
         [SerializeField] private GameObject indicator;
         [SerializeField] private GameObject tooCloseAlert;
+        [SerializeField] private Transform trails;
         [SerializeField] private float speed;
+        [SerializeField] private float fuelDecreaseRate;
+        [SerializeField] private float fuelDecreaseAmount;
+        [SerializeField] private Color fullFuelColor;
+        [SerializeField] private Color emptyFuelColor;
+
+        [SerializeField] private bool vip;
 
         private Rigidbody2D _rigidbody;
         private LineRenderer _lineRenderer;
@@ -20,11 +28,17 @@ namespace Ship
         private List<Vector3> _path;
         private Vector3 _currentPoint;
         private bool _usePath;
-        private bool _landed;
         private bool _spawned = true;
         private bool _canFly; 
 
         private ShipAnimation _shipAnimation;
+
+        private SpriteRenderer[] _trailSpriteRenderers;
+
+        private float _currentDecreaseTime;
+        private float _fuel = 1f;
+        private bool _fuelEmpty;
+        
         
         private void Start()
         {
@@ -37,12 +51,21 @@ namespace Ship
                 Destroy(indicator);
                 _canFly = true;
             };
-            transform.up = Vector3.zero - transform.position; 
+            transform.up = Vector3.zero - transform.position;
+
+            _trailSpriteRenderers = new SpriteRenderer[trails.childCount];
+            for (int i = 0; i < trails.childCount; i++)
+            {
+                _trailSpriteRenderers[i] = trails.GetChild(i).GetComponent<SpriteRenderer>();
+                _trailSpriteRenderers[i].color = fullFuelColor;
+            }
+
+            _currentDecreaseTime = fuelDecreaseRate;
         }
 
         private void FixedUpdate()
         {
-            if(_landed || !_canFly) return;
+            if(!_canFly) return;
             _rigidbody.velocity = transform.up * (speed * Time.deltaTime);
             if(!_usePath) return;
             _path[0] = transform.position;
@@ -50,6 +73,33 @@ namespace Ship
             if (Vector3.Distance(_currentPoint, transform.position) < 0.1f)
             {
                 TravelToNextPoint();
+            }
+        }
+
+        private void Update()
+        {
+            if (!_canFly) return;
+            _currentDecreaseTime -= Time.deltaTime;
+            if (_currentDecreaseTime <= 0)
+            {
+                _fuel -= fuelDecreaseAmount;
+                if (_fuel <= 0)
+                {
+                    _fuelEmpty = true;
+                    _fuel = 0;
+                }
+                _currentDecreaseTime = fuelDecreaseRate;
+                var trailColour = Color.Lerp(emptyFuelColor, fullFuelColor, _fuel);
+                foreach (var spriteRenderer in _trailSpriteRenderers)
+                {
+                    spriteRenderer.color = trailColour;
+                }
+            }
+
+            if (_fuelEmpty)
+            {
+                _canFly = false;
+                GameManager.Instance.GameOver();
             }
         }
 
@@ -103,7 +153,7 @@ namespace Ship
             {
                 Debug.Log("Land at pad");
                 // Landing logic here
-                _landed = true;
+                _canFly = false;
                 _rigidbody.simulated = false;
                 transform.position = other.transform.position;
                 _lineRenderer.SetPositions(Array.Empty<Vector3>());
@@ -126,7 +176,7 @@ namespace Ship
 
         private void DestroyShip()
         {
-            GameManager.Instance.ShipLanded();
+            GameManager.Instance.ShipLanded(vip);
             Destroy(gameObject);
         }
 

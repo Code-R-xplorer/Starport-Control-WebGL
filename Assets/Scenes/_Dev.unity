@@ -2029,7 +2029,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ships:
-  - {fileID: 965220984820292951, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
+  - {fileID: 4482783200738683513, guid: 6053938f17c4d204e811a2c590d67f55, type: 3}
+  - {fileID: 4482783200738683513, guid: 6053938f17c4d204e811a2c590d67f55, type: 3}
+  - {fileID: 4415995885455935799, guid: 8e846a50548e75f41b0fe61d66522937, type: 3}
+  - {fileID: 4415995885455935799, guid: 8e846a50548e75f41b0fe61d66522937, type: 3}
+  - {fileID: 459969664393124179, guid: b64d6babb449a9941830debd5df0a937, type: 3}
 --- !u!61 &788134502
 BoxCollider2D:
   m_ObjectHideFlags: 0
