@@ -21,6 +21,8 @@ namespace Managers
         [SerializeField] private GameObject gameOverUI;
         [SerializeField] private TextMeshProUGUI gameOverLandedText;
 
+        [HideInInspector] public PauseMenu pauseMenu;
+
 
         private void Awake()
         {
@@ -58,22 +60,27 @@ namespace Managers
         {
             blurVolume.SetActive(show);
         }
+
+        public void ShowPauseMenu()
+        {
+            pauseMenu.ToggleMenu();
+        }
         
         // Button Click Functions
 
         public void BMainMenu()
         {
-            
+            AppManager.Instance.LoadMainMenu();
         }
         
         public void BRestart()
         {
-            
+            AppManager.Instance.RestartLevel();
         }
         
         public void BNextLevel()
         {
-            
+            AppManager.Instance.LoadNextLevel();
         }
     }
 }

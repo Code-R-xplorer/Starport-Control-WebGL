@@ -8,7 +8,6 @@ namespace UI
 {
     public class HUD : MonoBehaviour
     {
-
         [SerializeField] private TextMeshProUGUI inboundShipsNumberText;
         [SerializeField] private TextMeshProUGUI shipsLandedNumberText;
         [SerializeField] private TextMeshProUGUI levelNumberText;
@@ -25,7 +24,5 @@ namespace UI
             if(inboundShips != -1) inboundShipsNumberText.text = inboundShips.ToString("D3");
             if(shipsLanded != -1) shipsLandedNumberText.text = shipsLanded.ToString("D3");
         }
-
-        
     }
 }

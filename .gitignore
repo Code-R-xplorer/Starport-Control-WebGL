@@ -68,3 +68,6 @@ crashlytics-build.properties
 /Assets/LicensedAssets/
 /Assets/LicensedAssets.meta
 
+/Assets/Scenes/Levels/Level_*/*.png
+/Assets/Scenes/Levels/Level_*/*.png.meta
+
