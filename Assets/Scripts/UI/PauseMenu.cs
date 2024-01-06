@@ -11,6 +11,7 @@ namespace UI
     {
        
         [SerializeField] private TextMeshProUGUI title;
+        [SerializeField] private GameObject mainMenuButton;
 
         private bool _paused;
         private bool _inMainMenu;
@@ -29,12 +30,14 @@ namespace UI
                     _inMainMenu = true;
                     title.text = "Options";
                     _mainMenuCanvas = GameObject.Find("MainMenu");
+                    mainMenuButton.SetActive(false);
                 }
                 else
                 {
                     _inMainMenu = false;
                     title.text = "Paused";
                     UIManager.Instance.pauseMenu = this;
+                    mainMenuButton.SetActive(true);
                 }
             };
         }
@@ -54,6 +57,7 @@ namespace UI
                 if (_inMainMenu)  _mainMenuCanvas.SetActive(false);
                 else
                 {
+                    InputManager.Instance.AllowInput(false);
                     Time.timeScale = 0f;
                     UIManager.Instance.ShowHUD(false);
                 }
@@ -64,10 +68,17 @@ namespace UI
                 if(_inMainMenu) _mainMenuCanvas.SetActive(true);
                 else
                 {
+                    InputManager.Instance.AllowInput(true);
                     Time.timeScale = 1f;
                     UIManager.Instance.ShowHUD(true);
                 }
             }
+        }
+
+        public void BMainMenu()
+        {
+            ToggleMenu();
+            AppManager.Instance.LoadMainMenu();
         }
         
         public void SetMasterVol(float value)

@@ -1154,6 +1154,7 @@ MonoBehaviour:
   blurVolume: {fileID: 1707446654}
   gameWinUI: {fileID: 1196487146}
   gameWinLandedText: {fileID: 996573291}
+  nextLevelButton: {fileID: 224098483}
   gameOverUI: {fileID: 1454836776}
   gameOverLandedText: {fileID: 1023548250}
   pauseMenu: {fileID: 0}

@@ -87,5 +87,15 @@ namespace Managers
             SceneManager.LoadScene("Main_Menu");
             
         }
+        
+        public void LevelCompleted()
+        {
+            levels[_currentSceneID + 1] = true;
+        }
+        
+        public bool FinalLevel()
+        {
+            return _currentSceneID == SceneManager.sceneCountInBuildSettings - 1;
+        }
     }
 }

@@ -55,6 +55,8 @@ namespace Managers
         // Dictionary of AudioSource components, each associated with an AudioItem's unique name.
         private readonly Dictionary<string, AudioSource> audioSources = new Dictionary<string, AudioSource>();
 
+        private Dictionary<string, GameObject> spawnedAudioSources;
+
         // Awake is called when the script instance is being loaded.
         private void Awake()
         {
@@ -101,11 +103,13 @@ namespace Managers
                     Debug.LogError($"Failed to add AudioSource to game object '{item.Name}': {ex.Message}");
                 }
             }
+
+            spawnedAudioSources = new Dictionary<string, GameObject>();
         }
 
         private void Start()
         {
-            Play("raceToMars", transform);
+            Play("music", transform);
         }
 
         // Play method is used to play an audio clip by its name and attach it to a specified parent transform.
@@ -248,6 +252,26 @@ namespace Managers
             if (source.volume <= 0f)
             {
                 source.volume = startVolume;
+            }
+        }
+
+        // PlayOneShot method plays a non-looping audio clip once by its name.
+        public void Play(string name)
+        {
+            // Check if the specified AudioSource exists in the audioSources dictionary.
+            if (audioSources.TryGetValue(name, out var source))
+            {
+                if(source.isPlaying) return;
+                // Play the audio clip once with the given volume if the source is found.
+                source?.Play();
+            }
+        }
+
+        public void StopAllAudio()
+        {
+            foreach (var audioSource in audioSources)
+            {
+                audioSource.Value.Stop();
             }
         }
     }

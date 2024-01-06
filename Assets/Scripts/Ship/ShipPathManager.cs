@@ -40,7 +40,7 @@ namespace Ship
                 var rayHit = Physics2D.GetRayIntersection(_camera.ScreenPointToRay(InputManager.Instance.Position));
                 if (!rayHit)
                 {
-                    Debug.Log("Path did not start with ship");
+                    AudioManager.Instance.PlayOneShot("error");
                     return;
                 }
                 if (rayHit.collider.CompareTag(Tags.Ship))
@@ -54,7 +54,7 @@ namespace Ship
                 }
                 else
                 {
-                    Debug.Log("Path did not start with ship");
+                    AudioManager.Instance.PlayOneShot("error");
                 }
             }
             else

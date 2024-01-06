@@ -146,6 +146,7 @@ namespace Ship
             {
                 Debug.Log("Collided with other ship");
                 // Ship collision logic here
+                AudioManager.Instance.PlayOneShot("shipCrash");
                 GameManager.Instance.GameOver();
             }
 
@@ -159,6 +160,7 @@ namespace Ship
                 _lineRenderer.SetPositions(Array.Empty<Vector3>());
                 _lineRenderer.positionCount = 0;
                 _shipAnimation.PlayLandingAnimation();
+                AudioManager.Instance.PlayOneShot("shipLand");
             }
         }
 
@@ -166,12 +168,14 @@ namespace Ship
         {
             if(!other.CompareTag(Tags.Ship)) return;
             tooCloseAlert.SetActive(true);
+            AudioManager.Instance.Play("shipClose");
         }
         
         private void OnTriggerExit2D(Collider2D other)
         {
             if(!other.CompareTag(Tags.Ship)) return;
             tooCloseAlert.SetActive(false);
+            AudioManager.Instance.Stop("shipClose");
         }
 
         private void DestroyShip()

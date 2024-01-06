@@ -71,3 +71,6 @@ crashlytics-build.properties
 /Assets/Scenes/Levels/Level_*/*.png
 /Assets/Scenes/Levels/Level_*/*.png.meta
 
+/Assets/WebGLTemplates/
+/Assets/WebGLTemplates.meta
+

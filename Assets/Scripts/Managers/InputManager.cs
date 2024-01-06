@@ -41,5 +41,11 @@ namespace Managers
         {
             _playerControls.Disable();
         }
+
+        public void AllowInput(bool allow)
+        {
+            if(allow) _playerControls.Controls.Enable();
+            else _playerControls.Controls.Disable();
+        }
     }
 }

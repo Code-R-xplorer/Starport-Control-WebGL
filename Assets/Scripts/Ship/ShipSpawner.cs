@@ -58,6 +58,7 @@ namespace Ship
                         _totalShipsToSpawn--;
                         _currentTimeBetweenSpawns = _timeBetweenSpawns;
                         UIManager.Instance.hud.UpdateInfo(inboundShips: _totalShipsToSpawn);
+                        AudioManager.Instance.PlayOneShot("shipEnter");
                     }
                 }
                 else _canSpawnShips = false;

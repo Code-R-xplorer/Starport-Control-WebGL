@@ -28,6 +28,8 @@ namespace Managers
 
         private void Start()
         {
+            Time.timeScale = 1f;
+            InputManager.Instance.AllowInput(true);
             shipSpawner.SetupSpawner(totalShipsToSpawn, timeBetweenSpawns);
         }
 
@@ -49,18 +51,22 @@ namespace Managers
         {
             // Show Game Win UI
             // Stop the game
-            
+            InputManager.Instance.AllowInput(false);
             onGameWin?.Invoke(_shipsLanded);
             Time.timeScale = 0f;
+            AudioManager.Instance.StopAllAudio();
+            AppManager.Instance.LevelCompleted();
         }
 
         public void GameOver()
         {
             // Show Game Over UI
             // Stop the game
+            InputManager.Instance.AllowInput(false);
             shipSpawner.StopSpawningShips();
             onGameOver?.Invoke(_shipsLanded);
             Time.timeScale = 0f;
+            AudioManager.Instance.StopAllAudio();
         }
     }
 }

@@ -16,6 +16,7 @@ namespace Managers
         [Header("Game Win Screen")]
         [SerializeField] private GameObject gameWinUI;
         [SerializeField] private TextMeshProUGUI gameWinLandedText;
+        [SerializeField] private GameObject nextLevelButton;
         
         [Header("Game Over Screen")]
         [SerializeField] private GameObject gameOverUI;
@@ -33,6 +34,7 @@ namespace Managers
         {
             GameManager.Instance.onGameWin += ShowGameWin;
             GameManager.Instance.onGameOver += ShowGameOver;
+            nextLevelButton.SetActive(!AppManager.Instance.FinalLevel());
         }
 
         private void ShowGameWin(int i)
