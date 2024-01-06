@@ -20,10 +20,13 @@ namespace Managers
 
         public event Action<int> onGameWin;
         public event Action<int> onGameOver;
+        
+        public ShipSpawner ShipSpawner { get; private set; }
 
         private void Awake()
         {
             Instance = this;
+            ShipSpawner = shipSpawner;
         }
 
         private void Start()
@@ -35,7 +38,7 @@ namespace Managers
 
         public void ShipLanded(bool vip)
         {
-            if(!vip && shipSpawner.VipSpawned) GameOver();
+            // if(!vip && shipSpawner.VipSpawned) GameOver();
             if (vip)
             {
                 shipSpawner.VipLanded();

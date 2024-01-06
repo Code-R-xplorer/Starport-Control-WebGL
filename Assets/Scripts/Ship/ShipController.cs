@@ -201,5 +201,10 @@ namespace Ship
             up.y += randy;
             transform.up = up;
         }
+
+        public bool IsVip()
+        {
+            return vip;
+        }
     }
 }
