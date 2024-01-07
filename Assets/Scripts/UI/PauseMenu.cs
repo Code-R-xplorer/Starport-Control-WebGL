@@ -45,7 +45,7 @@ namespace UI
         private void Start()
         {
             gameObject.SetActive(false);
-            _audioMixer = AppManager.Instance.audioMixer;
+            _audioMixer = GameManager.Instance.audioMixer;
         }
 
         public void ToggleMenu()
@@ -78,7 +78,7 @@ namespace UI
         public void BMainMenu()
         {
             ToggleMenu();
-            AppManager.Instance.LoadMainMenu();
+            GameManager.Instance.LoadMainMenu();
         }
         
         public void SetMasterVol(float value)

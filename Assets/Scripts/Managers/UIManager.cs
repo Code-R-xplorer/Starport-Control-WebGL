@@ -32,12 +32,10 @@ namespace Managers
 
         private void Start()
         {
-            GameManager.Instance.onGameWin += ShowGameWin;
-            GameManager.Instance.onGameOver += ShowGameOver;
-            nextLevelButton.SetActive(!AppManager.Instance.FinalLevel());
+            nextLevelButton.SetActive(!GameManager.Instance.FinalLevel());
         }
 
-        private void ShowGameWin(int i)
+        public void ShowGameWin(int i)
         {
             gameWinLandedText.text = i.ToString("D3");
             ShowHUD(false);
@@ -45,7 +43,7 @@ namespace Managers
             gameWinUI.SetActive(true);
         }
 
-        private void ShowGameOver(int i)
+        public void ShowGameOver(int i)
         {
             gameOverLandedText.text = i.ToString("D3");
             ShowHUD(false);
@@ -72,17 +70,17 @@ namespace Managers
 
         public void BMainMenu()
         {
-            AppManager.Instance.LoadMainMenu();
+            GameManager.Instance.LoadMainMenu();
         }
         
         public void BRestart()
         {
-            AppManager.Instance.RestartLevel();
+            GameManager.Instance.RestartLevel();
         }
         
         public void BNextLevel()
         {
-            AppManager.Instance.LoadNextLevel();
+            GameManager.Instance.LoadNextLevel();
         }
     }
 }

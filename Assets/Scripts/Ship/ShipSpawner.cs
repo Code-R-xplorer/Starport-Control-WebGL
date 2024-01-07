@@ -74,6 +74,7 @@ namespace Ship
                 {
                     _canSpawnVip = false;
                     VipSpawned = true;
+                    LevelManager.Instance.PickRandomPad();
                 }
                 else
                 {

@@ -17,7 +17,7 @@ namespace UI
         {
             _levelNumber = levelNumber;
             levelNumberText.text = _levelNumber.ToString();
-            _unlocked = AppManager.Instance.LevelUnlocked(_levelNumber);
+            _unlocked = GameManager.Instance.LevelUnlocked(_levelNumber);
             if (_unlocked)
             {
                 levelLocked.SetActive(false);
@@ -33,7 +33,7 @@ namespace UI
         {
             if (!_unlocked) return;
             AudioManager.Instance.PlayOneShot("uiSelect");
-            AppManager.Instance.LoadLevel(_levelNumber);
+            GameManager.Instance.LoadLevel(_levelNumber);
         }
 
         public void OnPointerEnter(PointerEventData eventData)

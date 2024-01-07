@@ -46,12 +46,6 @@ namespace Ship
                 if (rayHit.collider.CompareTag(Tags.Ship))
                 {
                     _selectedShipController = rayHit.transform.GetComponent<ShipController>();
-                    if (GameManager.Instance.ShipSpawner.VipSpawned && !_selectedShipController.IsVip())
-                    {
-                        AudioManager.Instance.PlayOneShot("error");
-                        _recordPath = false;
-                        return;
-                    }
                     _recordPath = true;
                     _currentRecordInterval = recordInterval;
                     var pos = _camera.ScreenToWorldPoint(InputManager.Instance.Position);

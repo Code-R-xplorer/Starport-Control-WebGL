@@ -99,7 +99,7 @@ namespace Ship
             if (_fuelEmpty)
             {
                 _canFly = false;
-                GameManager.Instance.GameOver();
+                LevelManager.Instance.GameOver();
             }
         }
 
@@ -147,12 +147,28 @@ namespace Ship
                 Debug.Log("Collided with other ship");
                 // Ship collision logic here
                 AudioManager.Instance.PlayOneShot("shipCrash");
-                GameManager.Instance.GameOver();
+                LevelManager.Instance.GameOver();
             }
 
             if (other.collider.CompareTag(Tags.Pad))
             {
                 Debug.Log("Land at pad");
+                var pad = other.gameObject.GetComponent<LandingPad>();
+                if (pad.VipPad)
+                {
+                    if (vip)
+                    {
+                        pad.VipLanded();
+                    }
+                    else
+                    {
+                        LevelManager.Instance.GameOver();
+                    }
+                }
+                else
+                {
+                    if(vip) LevelManager.Instance.GameOver();
+                }
                 // Landing logic here
                 _canFly = false;
                 _rigidbody.simulated = false;
@@ -180,7 +196,7 @@ namespace Ship
 
         private void DestroyShip()
         {
-            GameManager.Instance.ShipLanded(vip);
+            LevelManager.Instance.ShipLanded(vip);
             Destroy(gameObject);
         }
 

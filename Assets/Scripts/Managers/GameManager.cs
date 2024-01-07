@@ -1,75 +1,99 @@
-﻿using System;
-using Ship;
+﻿using System.Collections.Generic;
+using UI;
 using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
 
 namespace Managers
 {
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
+
+        public AudioMixer audioMixer;
         
-        [SerializeField] private int totalShipsToSpawn;
-        [SerializeField] private float timeBetweenSpawns;
+        public Dictionary<int, bool> levels;
+        private List<int> _levelIDs;
+        public string levelPrefix;
 
-        [SerializeField] private ShipSpawner shipSpawner;
-
-        private int _shipsLanded;
-        private float _currentTimeBetweenSpawns;
-
-        private int _spawnedShips;
-
-        public event Action<int> onGameWin;
-        public event Action<int> onGameOver;
-        
-        public ShipSpawner ShipSpawner { get; private set; }
+        private int _currentSceneID;
 
         private void Awake()
         {
-            Instance = this;
-            ShipSpawner = shipSpawner;
-        }
-
-        private void Start()
-        {
-            Time.timeScale = 1f;
-            InputManager.Instance.AllowInput(true);
-            shipSpawner.SetupSpawner(totalShipsToSpawn, timeBetweenSpawns);
-        }
-
-        public void ShipLanded(bool vip)
-        {
-            // if(!vip && shipSpawner.VipSpawned) GameOver();
-            if (vip)
+            // Check if there is already an AppManager instance and if it's different from this instance.
+            if (Instance != null && Instance != this)
             {
-                shipSpawner.VipLanded();
+                // Destroy this game object if there's already an AppManager instance.
+                Destroy(gameObject);
+                return;
             }
-            _shipsLanded++;
-            UIManager.Instance.hud.UpdateInfo(shipsLanded: _shipsLanded);
 
-            if (_shipsLanded == totalShipsToSpawn) GameWin();
+            // Set the AppManager instance to this instance.
+            Instance = this;
+            // Make sure the AppManager instance is not destroyed when loading a new scene.
+            DontDestroyOnLoad(gameObject);
+            
+            SceneManager.sceneLoaded += (scene, mode) =>
+            {
+                if (scene.name == "Main_Menu")
+                {
+                    GameObject.Find("LevelSelect").GetComponent<LevelMenu>().CreateLevelItems(_levelIDs);
+                }
+            };
+            levels = new Dictionary<int, bool>();
+            _levelIDs = new List<int>();
+            for (int i = 1; i < SceneManager.sceneCountInBuildSettings; i++)
+            {
+                _levelIDs.Add(i);
+            }
+            
+            foreach (var id in _levelIDs)
+            {
+                levels.Add(id,false);
+            }
+
+            levels[1] = true;
+        }
+        
+        public bool LevelUnlocked(int levelID)
+        {
+            return levels[levelID];
+        }
+        
+        public void LoadLevel(int levelID)
+        {
+            _currentSceneID = levelID;
+            SceneManager.LoadScene($"{levelPrefix}{levelID}");
         }
 
-
-        private void GameWin()
+        public void RestartLevel()
         {
-            // Show Game Win UI
-            // Stop the game
-            InputManager.Instance.AllowInput(false);
-            onGameWin?.Invoke(_shipsLanded);
-            Time.timeScale = 0f;
-            AudioManager.Instance.StopAllAudio();
-            AppManager.Instance.LevelCompleted();
+            SceneManager.LoadScene($"{levelPrefix}{_currentSceneID}");
         }
 
-        public void GameOver()
+        public void LoadNextLevel()
         {
-            // Show Game Over UI
-            // Stop the game
-            InputManager.Instance.AllowInput(false);
-            shipSpawner.StopSpawningShips();
-            onGameOver?.Invoke(_shipsLanded);
-            Time.timeScale = 0f;
-            AudioManager.Instance.StopAllAudio();
+            if (_currentSceneID < SceneManager.sceneCountInBuildSettings - 1)
+            {
+                _currentSceneID++;
+                LoadLevel(_currentSceneID);
+            }
+        }
+
+        public void LoadMainMenu()
+        {
+            SceneManager.LoadScene("Main_Menu");
+            
+        }
+        
+        public void LevelCompleted()
+        {
+            levels[_currentSceneID + 1] = true;
+        }
+        
+        public bool FinalLevel()
+        {
+            return _currentSceneID == SceneManager.sceneCountInBuildSettings - 1;
         }
     }
 }
