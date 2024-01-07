@@ -21,6 +21,7 @@ namespace Managers
         [Header("Game Over Screen")]
         [SerializeField] private GameObject gameOverUI;
         [SerializeField] private TextMeshProUGUI gameOverLandedText;
+        [SerializeField] private TextMeshProUGUI reasonText;
 
         [HideInInspector] public PauseMenu pauseMenu;
 
@@ -43,9 +44,10 @@ namespace Managers
             gameWinUI.SetActive(true);
         }
 
-        public void ShowGameOver(int i)
+        public void ShowGameOver(int i, string reason)
         {
             gameOverLandedText.text = i.ToString("D3");
+            reasonText.text = reason;
             ShowHUD(false);
             ShowBlur(true);
             gameOverUI.SetActive(true);

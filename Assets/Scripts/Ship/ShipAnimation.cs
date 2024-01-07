@@ -9,9 +9,11 @@ namespace Ship
         private Animator _animator;
         private static readonly int ShipLand = Animator.StringToHash("ShipLand");
         private static readonly int HideIndicator = Animator.StringToHash("HideIndicator");
+        private static readonly int Explosion = Animator.StringToHash("Explosion");
 
         public event Action OnLandingFinished;
         public event Action OnIndicatorFinished;
+        public event Action OnExplosionFinished;
 
         private void Start()
         {
@@ -24,6 +26,11 @@ namespace Ship
             _animator.Play(ShipLand, -1, 0f);
         }
 
+        public void PlayExplosionAnimation()
+        {
+            _animator.Play(Explosion, -1, 0f);
+        }
+
         public void AnimationFinished(string input)
         {
             switch (input)
@@ -33,6 +40,9 @@ namespace Ship
                     break;
                 case "Indicator":
                     OnIndicatorFinished?.Invoke();
+                    break;
+                case "Explosion":
+                    OnExplosionFinished?.Invoke();
                     break;
             }
         }

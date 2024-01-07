@@ -51,6 +51,10 @@ namespace Ship
                 Destroy(indicator);
                 _canFly = true;
             };
+            _shipAnimation.OnExplosionFinished += () =>
+            {
+                LevelManager.Instance.GameOver("Two ships collided!");
+            };
             transform.up = Vector3.zero - transform.position;
 
             _trailSpriteRenderers = new SpriteRenderer[trails.childCount];
@@ -99,7 +103,7 @@ namespace Ship
             if (_fuelEmpty)
             {
                 _canFly = false;
-                LevelManager.Instance.GameOver();
+                LevelManager.Instance.GameOver("A ship ran out of fuel!");
             }
         }
 
@@ -147,7 +151,9 @@ namespace Ship
                 Debug.Log("Collided with other ship");
                 // Ship collision logic here
                 AudioManager.Instance.PlayOneShot("shipCrash");
-                LevelManager.Instance.GameOver();
+                _shipAnimation.PlayExplosionAnimation();
+                _canFly = false;
+                _rigidbody.velocity = Vector2.zero;
             }
 
             if (other.collider.CompareTag(Tags.Pad))
@@ -162,12 +168,12 @@ namespace Ship
                     }
                     else
                     {
-                        LevelManager.Instance.GameOver();
+                        LevelManager.Instance.GameOver("Another ship landed on the VIP pad!");
                     }
                 }
                 else
                 {
-                    if(vip) LevelManager.Instance.GameOver();
+                    if(vip) LevelManager.Instance.GameOver("The VIP landed on the wrong pad!");
                 }
                 // Landing logic here
                 _canFly = false;
@@ -182,14 +188,14 @@ namespace Ship
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if(!other.CompareTag(Tags.Ship)) return;
+            if(!other.CompareTag(Tags.Ship) || _canFly) return;
             tooCloseAlert.SetActive(true);
             AudioManager.Instance.Play("shipClose");
         }
         
         private void OnTriggerExit2D(Collider2D other)
         {
-            if(!other.CompareTag(Tags.Ship)) return;
+            if(!other.CompareTag(Tags.Ship) || _canFly) return;
             tooCloseAlert.SetActive(false);
             AudioManager.Instance.Stop("shipClose");
         }

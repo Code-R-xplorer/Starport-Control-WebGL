@@ -21,7 +21,6 @@ namespace Ship
         public void SetAsVip()
         {
             VipPad = true;
-            _animator.enabled = true;
             _animator.Play(_flashLights, -1, 0f);
         }
 
@@ -29,7 +28,6 @@ namespace Ship
         {
             VipPad = false;
             _animator.Play(_baseState, -1, 0f);
-            _animator.enabled = false;
         }
     }
 }

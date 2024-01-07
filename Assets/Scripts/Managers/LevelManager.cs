@@ -68,13 +68,13 @@ namespace Managers
             GameManager.Instance.LevelCompleted();
         }
 
-        public void GameOver()
+        public void GameOver(string reason)
         {
             // Show Game Over UI
             // Stop the game
             InputManager.Instance.AllowInput(false);
             shipSpawner.StopSpawningShips();
-            UIManager.Instance.ShowGameOver(_shipsLanded);
+            UIManager.Instance.ShowGameOver(_shipsLanded, reason);
             Time.timeScale = 0f;
             AudioManager.Instance.StopAllAudio();
         }
