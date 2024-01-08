@@ -483,7 +483,7 @@ MonoBehaviour:
     RolloffFactor: 0
     AudioMixerGroup: {fileID: 4670782290801204266, guid: 6918fbc3cc2252a47ac1e2544fcace90, type: 2}
   - Name: shipClose
-    Clip: {fileID: 8300000, guid: e33b43302bcd353439c33b242fff54e2, type: 3}
+    Clip: {fileID: 8300000, guid: 341234f7de388d845a9108670ae1e6e1, type: 3}
     Volume: 1
     Loop: 1
     SpatialBlend: 0
