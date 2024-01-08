@@ -153,6 +153,7 @@ namespace Ship
                 AudioManager.Instance.PlayOneShot("shipCrash");
                 _shipAnimation.PlayExplosionAnimation();
                 _canFly = false;
+                tooCloseAlert.SetActive(false);
                 _rigidbody.velocity = Vector2.zero;
             }
 

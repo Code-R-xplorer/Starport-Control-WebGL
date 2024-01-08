@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 965220984820292951, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
       propertyPath: m_Name
-      value: VIP_Ship Variant
+      value: VIP_Ship
       objectReference: {fileID: 0}
     - target: {fileID: 1035610907810171295, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -96,6 +96,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: eb061bf7e1ac3164a839bf42c3d15268, type: 3}
+    - target: {fileID: 7794768512182333955, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8291504228050890562, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.58457
