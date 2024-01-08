@@ -188,14 +188,14 @@ namespace Ship
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if(!other.CompareTag(Tags.Ship) || _canFly) return;
+            if(!other.CompareTag(Tags.Ship) || !_canFly) return;
             tooCloseAlert.SetActive(true);
             AudioManager.Instance.Play("shipClose");
         }
         
         private void OnTriggerExit2D(Collider2D other)
         {
-            if(!other.CompareTag(Tags.Ship) || _canFly) return;
+            if(!other.CompareTag(Tags.Ship) || !_canFly) return;
             tooCloseAlert.SetActive(false);
             AudioManager.Instance.Stop("shipClose");
         }

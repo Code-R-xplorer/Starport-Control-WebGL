@@ -60,6 +60,7 @@ namespace UI
                     InputManager.Instance.AllowInput(false);
                     Time.timeScale = 0f;
                     UIManager.Instance.ShowHUD(false);
+                    UIManager.Instance.ShowBlur(true);
                 }
             }
             else
@@ -71,6 +72,7 @@ namespace UI
                     InputManager.Instance.AllowInput(true);
                     Time.timeScale = 1f;
                     UIManager.Instance.ShowHUD(true);
+                    UIManager.Instance.ShowBlur(false);
                 }
             }
         }
