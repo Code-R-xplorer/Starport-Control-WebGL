@@ -260,10 +260,15 @@ MonoBehaviour:
   tooCloseAlert: {fileID: 7794768512182333955}
   trails: {fileID: 5619408363974315237}
   speed: 0
+  rotationSpeed: 0
   fuelDecreaseRate: 0
   fuelDecreaseAmount: 0
   fullFuelColor: {r: 0, g: 1, b: 0, a: 1}
   emptyFuelColor: {r: 1, g: 0, b: 0, a: 1}
+  dottedLineMaterial: {fileID: 2100000, guid: 6cb5096576e029144ae003293ab4701e, type: 2}
+  solidLineMaterial: {fileID: 2100000, guid: 4840285a4571b614eab4514f64600af5, type: 2}
+  dottedLineWidth: 0.2
+  solidLineWidth: 0.05
   vip: 0
 --- !u!114 &6571863857174756209
 MonoBehaviour:
@@ -384,7 +389,7 @@ LineRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 5
   m_Positions: []
   m_Parameters:
     serializedVersion: 3

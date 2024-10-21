@@ -14,10 +14,16 @@ namespace Ship
         [SerializeField] private GameObject tooCloseAlert;
         [SerializeField] private Transform trails;
         [SerializeField] private float speed;
+        [SerializeField] private float rotationSpeed;
         [SerializeField] private float fuelDecreaseRate;
         [SerializeField] private float fuelDecreaseAmount;
         [SerializeField] private Color fullFuelColor;
         [SerializeField] private Color emptyFuelColor;
+        
+        [SerializeField] private Material dottedLineMaterial;
+        [SerializeField] private Material solidLineMaterial;
+        [SerializeField] private float dottedLineWidth;
+        [SerializeField] private float solidLineWidth;
 
         [SerializeField] private bool vip;
 
@@ -66,15 +72,28 @@ namespace Ship
         {
             if (!_canFly) return;
             UpdateFuel();
+            if (_currentPoint != Vector3.zero) SmoothRotation();
             if (_usePath) FlyAlongPath();
             else transform.position += transform.up * (Time.deltaTime * speed);
+        }
+
+        private void SmoothRotation()
+        {
+            // Calculate the direction to the current point
+            Vector3 targetDirection = (_currentPoint - transform.position).normalized;
+
+            // Smoothly interpolate between current direction (transform.up) and target direction
+            Vector3 smoothDirection = Vector3.Slerp(transform.up, targetDirection, rotationSpeed * Time.deltaTime);
+
+            // Set the new smoothed direction as the ship's up direction
+            transform.up = smoothDirection;
         }
 
         private void FlyAlongPath()
         {
             if (_path.Count < 3 && _waitingForPath)
             {
-                transform.up = _currentPoint - transform.position;
+                // transform.up = _currentPoint - transform.position;
                 transform.position = Vector3.MoveTowards(transform.position, InputManager.Instance.Position, Time.deltaTime * speed);
                 return;
             }
@@ -122,6 +141,14 @@ namespace Ship
             transform.up = new Vector3(InputManager.Instance.Position.x, InputManager.Instance.Position.y) - transform.position;
             _usePath = true;
             _waitingForPath = true;
+            SetLineAppearance(dottedLineMaterial, dottedLineWidth);
+        }
+
+        private void SetLineAppearance(Material material, float lineWidth)
+        {
+            _lineRenderer.material = material;
+            _lineRenderer.startWidth = lineWidth;
+            _lineRenderer.endWidth = lineWidth;
         }
 
         private void TravelToNextPoint()
@@ -132,12 +159,13 @@ namespace Ship
                 _lineRenderer.positionCount = 0;
                 _usePath = false;
                 transform.up = _currentPoint - transform.position; 
+                _currentPoint = Vector3.zero;
                 return;
             }
             
             _currentPoint = _path[1];
             _path.Remove(_path[1]);
-            transform.up = _currentPoint - transform.position; 
+            // transform.up = _currentPoint - transform.position; 
             _lineRenderer.positionCount = _path.Count;
             _lineRenderer.SetPositions(_path.ToArray());
         }
@@ -221,6 +249,14 @@ namespace Ship
             up.x += randX;
             up.y += randy;
             transform.up = up;
+        }
+
+        public void AddFinalPoint(Vector3 point)
+        {
+            _path.Add(point);
+            _lineRenderer.positionCount = _path.Count;
+            _lineRenderer.SetPositions(_path.ToArray());
+            SetLineAppearance(solidLineMaterial, solidLineWidth);
         }
     }
 }
