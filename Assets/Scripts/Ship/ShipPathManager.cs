@@ -6,14 +6,13 @@ namespace Ship
 {
     public class ShipPathManager : MonoBehaviour
     {
-        [SerializeField] private float recordInterval;
+        [SerializeField] private float recordDistance = 0.5f; // Minimum distance between points
 
-        private float _currentRecordInterval;
         private bool _recordPath;
         private Camera _camera;
-
         private ShipController _selectedShipController;
-        
+        private Vector3 _lastRecordedPosition; // Store the last recorded position
+
         private void Start()
         {
             InputManager.Instance.OnPrimary += RecordPath;
@@ -23,13 +22,15 @@ namespace Ship
         private void Update()
         {
             if (!_recordPath) return;
-            _currentRecordInterval -= Time.deltaTime;
-            if (_currentRecordInterval <= 0)
+
+            var currentPosition = _camera.ScreenToWorldPoint(InputManager.Instance.Position);
+            currentPosition.z = 0;
+
+            // Check distance between last recorded point and current position
+            if (Vector3.Distance(_lastRecordedPosition, currentPosition) >= recordDistance)
             {
-                var pos = _camera.ScreenToWorldPoint(InputManager.Instance.Position);
-                pos.z = 0;
-                _selectedShipController.AddPathPoint(pos);
-                _currentRecordInterval = recordInterval;
+                _selectedShipController.AddPathPoint(currentPosition);
+                _lastRecordedPosition = currentPosition; // Update last recorded position
             }
         }
 
@@ -47,10 +48,11 @@ namespace Ship
                 {
                     _selectedShipController = rayHit.transform.GetComponent<ShipController>();
                     _recordPath = true;
-                    _currentRecordInterval = recordInterval;
+
                     var pos = _camera.ScreenToWorldPoint(InputManager.Instance.Position);
                     pos.z = 0;
                     _selectedShipController.StartPath(pos);
+                    _lastRecordedPosition = pos; // Set the first position
                 }
                 else
                 {
@@ -61,10 +63,10 @@ namespace Ship
             {
                 if (!_recordPath) return;
                 _recordPath = false;
+
                 var pos = _camera.ScreenToWorldPoint(InputManager.Instance.Position);
                 pos.z = 0;
-                _selectedShipController.AddPathPoint(pos);
-                
+                _selectedShipController.AddFinalPoint(pos);
             }
         }
     }
