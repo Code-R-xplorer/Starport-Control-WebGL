@@ -72,7 +72,7 @@ namespace Managers
             IEnumerator ShipsCollide()
             {
                 AudioManager.Instance.PlayOneShot("shipCrash");
-                yield return new WaitForSeconds(0.5f);
+                yield return new WaitForSeconds(1f);
                 GameOver("Two ships collided!");
             }
         }
