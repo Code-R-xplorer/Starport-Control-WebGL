@@ -67,6 +67,7 @@ namespace Ship
                 var pos = _camera.ScreenToWorldPoint(InputManager.Instance.Position);
                 pos.z = 0;
                 _selectedShipController.AddFinalPoint(pos);
+                _selectedShipController = null;
             }
         }
     }

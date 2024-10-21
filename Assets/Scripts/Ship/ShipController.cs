@@ -10,22 +10,25 @@ namespace Ship
 {
     public class ShipController : MonoBehaviour
     {
+        [Header("Sprites")]
         [SerializeField] private GameObject indicator;
         [SerializeField] private GameObject tooCloseAlert;
         [SerializeField] private Transform trails;
+        [Header("Movement")]
         [SerializeField] private float speed;
         [SerializeField] private float rotationSpeed;
+        [Header("Fuel")]
         [SerializeField] private float fuelDecreaseRate;
         [SerializeField] private float fuelDecreaseAmount;
         [SerializeField] private Color fullFuelColor;
         [SerializeField] private Color emptyFuelColor;
-        
+        [Header("Path")]
         [SerializeField] private Material dottedLineMaterial;
         [SerializeField] private Material solidLineMaterial;
         [SerializeField] private float dottedLineWidth;
         [SerializeField] private float solidLineWidth;
-
-        [SerializeField] private bool vip;
+        
+        private bool _vip;
 
         private LineRenderer _lineRenderer;
 
@@ -66,6 +69,7 @@ namespace Ship
             }
 
             _currentDecreaseTime = fuelDecreaseRate;
+            _vip = gameObject.name.Contains("VIP");
         }
 
         private void Update()
@@ -138,7 +142,7 @@ namespace Ship
                 point
             };
             _currentPoint = point;
-            transform.up = new Vector3(InputManager.Instance.Position.x, InputManager.Instance.Position.y) - transform.position;
+            transform.up = _currentPoint - transform.position;
             _usePath = true;
             _waitingForPath = true;
             SetLineAppearance(dottedLineMaterial, dottedLineWidth);
@@ -155,11 +159,7 @@ namespace Ship
         {
             if (_path.Count == 1)
             {
-                _lineRenderer.SetPositions(Array.Empty<Vector3>());
-                _lineRenderer.positionCount = 0;
-                _usePath = false;
-                transform.up = _currentPoint - transform.position; 
-                _currentPoint = Vector3.zero;
+                ResetPath();
                 return;
             }
             
@@ -168,6 +168,15 @@ namespace Ship
             // transform.up = _currentPoint - transform.position; 
             _lineRenderer.positionCount = _path.Count;
             _lineRenderer.SetPositions(_path.ToArray());
+        }
+
+        private void ResetPath()
+        {
+            _lineRenderer.SetPositions(Array.Empty<Vector3>());
+            _lineRenderer.positionCount = 0;
+            _usePath = false;
+            transform.up = _currentPoint - transform.position; 
+            _currentPoint = Vector3.zero;
         }
 
         public void AddPathPoint(Vector3 point)
@@ -191,7 +200,7 @@ namespace Ship
                 var pad = other.gameObject.GetComponent<LandingPad>();
                 if (pad.VipPad)
                 {
-                    if (vip)
+                    if (_vip)
                     {
                         pad.VipLanded();
                     }
@@ -202,7 +211,7 @@ namespace Ship
                 }
                 else
                 {
-                    if(vip) LevelManager.Instance.GameOver("The VIP landed on the wrong pad!");
+                    if(_vip) LevelManager.Instance.GameOver("The VIP landed on the wrong pad!");
                 }
                 // Landing logic here
                 _canFly = false;
@@ -230,22 +239,16 @@ namespace Ship
 
         private void DestroyShip()
         {
-            LevelManager.Instance.ShipLanded(vip);
+            LevelManager.Instance.ShipLanded(_vip);
             Destroy(gameObject);
         }
 
         void OnBecameInvisible()
         {
-            if (_spawned)
-            {
-                _spawned = false;
-                return;
-            }
-            Debug.Log("Out of View");
-            var randX = Random.Range(-0.5f, 0.5f);
-            var randy = Random.Range(-0.5f, 0.5f);
-            var up = transform.up;
-            up *= -1;
+            ResetPath();
+            var randX = Random.Range(-20f, 20f);
+            var randy = Random.Range(-20f, 20f);
+            var up = Vector3.zero - transform.position;;
             up.x += randX;
             up.y += randy;
             transform.up = up;
