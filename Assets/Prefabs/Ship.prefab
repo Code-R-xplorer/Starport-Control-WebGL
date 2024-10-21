@@ -269,7 +269,6 @@ MonoBehaviour:
   solidLineMaterial: {fileID: 2100000, guid: 4840285a4571b614eab4514f64600af5, type: 2}
   dottedLineWidth: 0.2
   solidLineWidth: 0.05
-  vip: 0
 --- !u!114 &6571863857174756209
 MonoBehaviour:
   m_ObjectHideFlags: 0

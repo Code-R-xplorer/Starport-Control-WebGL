@@ -41,7 +41,7 @@ namespace Ship
                 var rayHit = Physics2D.GetRayIntersection(_camera.ScreenPointToRay(InputManager.Instance.Position));
                 if (!rayHit)
                 {
-                    AudioManager.Instance.PlayOneShot("error");
+                    AudioManager.Instance.PlayOneShotWithRandomPitch("error", 0.8f, 1.2f);
                     return;
                 }
                 if (rayHit.collider.CompareTag(Tags.Ship))
@@ -56,7 +56,7 @@ namespace Ship
                 }
                 else
                 {
-                    AudioManager.Instance.PlayOneShot("error");
+                    AudioManager.Instance.PlayOneShotWithRandomPitch("error", 0.8f, 1.2f);
                 }
             }
             else

@@ -35,7 +35,6 @@ namespace Ship
         private List<Vector3> _path;
         private Vector3 _currentPoint;
         private bool _usePath;
-        private bool _spawned = true;
         private bool _canFly; 
 
         private ShipAnimation _shipAnimation;
@@ -97,7 +96,6 @@ namespace Ship
         {
             if (_path.Count < 3 && _waitingForPath)
             {
-                // transform.up = _currentPoint - transform.position;
                 transform.position = Vector3.MoveTowards(transform.position, InputManager.Instance.Position, Time.deltaTime * speed);
                 return;
             }
@@ -165,7 +163,6 @@ namespace Ship
             
             _currentPoint = _path[1];
             _path.Remove(_path[1]);
-            // transform.up = _currentPoint - transform.position; 
             _lineRenderer.positionCount = _path.Count;
             _lineRenderer.SetPositions(_path.ToArray());
         }
@@ -219,7 +216,7 @@ namespace Ship
                 _lineRenderer.SetPositions(Array.Empty<Vector3>());
                 _lineRenderer.positionCount = 0;
                 _shipAnimation.PlayLandingAnimation();
-                AudioManager.Instance.PlayOneShot("shipLand");
+                AudioManager.Instance.PlayOneShotWithRandomPitch("shipLand", 0.9f, 1.1f);
             }
         }
 
