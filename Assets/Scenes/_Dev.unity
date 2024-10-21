@@ -3790,7 +3790,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ships:
-  - {fileID: 3985902124489219544, guid: 436816f1fb0bb7e429bae167325420e7, type: 3}
+  - {fileID: 4482783200738683513, guid: 6053938f17c4d204e811a2c590d67f55, type: 3}
+  - {fileID: 459969664393124179, guid: b64d6babb449a9941830debd5df0a937, type: 3}
+  - {fileID: 4415995885455935799, guid: 8e846a50548e75f41b0fe61d66522937, type: 3}
 --- !u!61 &788134502
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -8026,7 +8028,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de2390f70c7342479360ecb17fdf4e39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalShipsToSpawn: 2
+  totalShipsToSpawn: 10
   timeBetweenSpawns: 0.5
   shipSpawner: {fileID: 788134501}
   explosionEffect: {fileID: 858909745809713163, guid: 7f8ea5e8b5a28d546b50bbb5ef42103e, type: 3}

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Managers;
 using UnityEngine;
 using Utilities;
@@ -22,7 +21,6 @@ namespace Ship
 
         [SerializeField] private bool vip;
 
-        private Rigidbody2D _rigidbody;
         private LineRenderer _lineRenderer;
 
         private List<Vector3> _path;
@@ -38,11 +36,12 @@ namespace Ship
         private float _currentDecreaseTime;
         private float _fuel = 1f;
         private bool _fuelEmpty;
+
+        private bool _waitingForPath;
         
         
         private void Start()
         {
-            _rigidbody = GetComponent<Rigidbody2D>();
             _lineRenderer = GetComponent<LineRenderer>();
             _shipAnimation = GetComponent<ShipAnimation>();
             _shipAnimation.OnLandingFinished += DestroyShip;
@@ -50,10 +49,6 @@ namespace Ship
             {
                 Destroy(indicator);
                 _canFly = true;
-            };
-            _shipAnimation.OnExplosionFinished += () =>
-            {
-                LevelManager.Instance.GameOver("Two ships collided!");
             };
             transform.up = Vector3.zero - transform.position;
 
@@ -67,30 +62,45 @@ namespace Ship
             _currentDecreaseTime = fuelDecreaseRate;
         }
 
-        private void FixedUpdate()
+        private void Update()
         {
-            if(!_canFly) return;
-            _rigidbody.velocity = transform.up * (speed * Time.deltaTime);
-            if(!_usePath) return;
+            if (!_canFly) return;
+            UpdateFuel();
+            if (_usePath) FlyAlongPath();
+            else transform.position += transform.up * (Time.deltaTime * speed);
+        }
+
+        private void FlyAlongPath()
+        {
+            if (_path.Count < 3 && _waitingForPath)
+            {
+                transform.up = _currentPoint - transform.position;
+                transform.position = Vector3.MoveTowards(transform.position, InputManager.Instance.Position, Time.deltaTime * speed);
+                return;
+            }
+            
+            _waitingForPath = false;
+            
             _path[0] = transform.position;
-            _lineRenderer.SetPosition(0, _path[0]);
+            _lineRenderer.SetPosition(0, transform.position);
             if (Vector3.Distance(_currentPoint, transform.position) < 0.1f)
             {
                 TravelToNextPoint();
             }
+            else transform.position = Vector3.MoveTowards(transform.position, _currentPoint, Time.deltaTime * speed);
         }
 
-        private void Update()
+        private void UpdateFuel()
         {
-            if (!_canFly) return;
             _currentDecreaseTime -= Time.deltaTime;
             if (_currentDecreaseTime <= 0)
             {
                 _fuel -= fuelDecreaseAmount;
                 if (_fuel <= 0)
                 {
-                    _fuelEmpty = true;
                     _fuel = 0;
+                    _canFly = false;
+                    LevelManager.Instance.GameOver("A ship ran out of fuel!");
                 }
                 _currentDecreaseTime = fuelDecreaseRate;
                 var trailColour = Color.Lerp(emptyFuelColor, fullFuelColor, _fuel);
@@ -98,12 +108,6 @@ namespace Ship
                 {
                     spriteRenderer.color = trailColour;
                 }
-            }
-
-            if (_fuelEmpty)
-            {
-                _canFly = false;
-                LevelManager.Instance.GameOver("A ship ran out of fuel!");
             }
         }
 
@@ -114,8 +118,10 @@ namespace Ship
                 transform.position,
                 point
             };
-            TravelToNextPoint();
+            _currentPoint = point;
+            transform.up = new Vector3(InputManager.Instance.Position.x, InputManager.Instance.Position.y) - transform.position;
             _usePath = true;
+            _waitingForPath = true;
         }
 
         private void TravelToNextPoint()
@@ -131,7 +137,6 @@ namespace Ship
             
             _currentPoint = _path[1];
             _path.Remove(_path[1]);
-
             transform.up = _currentPoint - transform.position; 
             _lineRenderer.positionCount = _path.Count;
             _lineRenderer.SetPositions(_path.ToArray());
@@ -148,18 +153,13 @@ namespace Ship
         {
             if (other.collider.CompareTag(Tags.Ship))
             {
-                Debug.Log("Collided with other ship");
-                // Ship collision logic here
-                AudioManager.Instance.PlayOneShot("shipCrash");
-                _shipAnimation.PlayExplosionAnimation();
+                LevelManager.Instance.ShipsCollided(transform.position);
                 _canFly = false;
-                tooCloseAlert.SetActive(false);
-                _rigidbody.velocity = Vector2.zero;
+                gameObject.SetActive(false);
             }
 
             if (other.collider.CompareTag(Tags.Pad))
             {
-                Debug.Log("Land at pad");
                 var pad = other.gameObject.GetComponent<LandingPad>();
                 if (pad.VipPad)
                 {
@@ -178,7 +178,6 @@ namespace Ship
                 }
                 // Landing logic here
                 _canFly = false;
-                _rigidbody.simulated = false;
                 transform.position = other.transform.position;
                 _lineRenderer.SetPositions(Array.Empty<Vector3>());
                 _lineRenderer.positionCount = 0;
@@ -215,7 +214,6 @@ namespace Ship
                 return;
             }
             Debug.Log("Out of View");
-            // var rot = transform.rotation;
             var randX = Random.Range(-0.5f, 0.5f);
             var randy = Random.Range(-0.5f, 0.5f);
             var up = transform.up;
@@ -223,11 +221,6 @@ namespace Ship
             up.x += randX;
             up.y += randy;
             transform.up = up;
-        }
-
-        public bool IsVip()
-        {
-            return vip;
         }
     }
 }
