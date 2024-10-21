@@ -27,6 +27,8 @@ namespace Ship
         [SerializeField] private Material solidLineMaterial;
         [SerializeField] private float dottedLineWidth;
         [SerializeField] private float solidLineWidth;
+        [Header("Screen")]
+        [SerializeField] private float boundaryBuffer = 0.05f; // Extra space to trigger the off-screen event
         
         private bool _vip;
 
@@ -47,8 +49,10 @@ namespace Ship
 
         private bool _waitingForPath;
         private LandingPad _landingPad;
-        
-        
+        private Camera _camera;
+        private bool _hasEnteredScreen;
+
+
         private void Start()
         {
             _lineRenderer = GetComponent<LineRenderer>();
@@ -70,12 +74,14 @@ namespace Ship
 
             _currentDecreaseTime = fuelDecreaseRate;
             _vip = gameObject.name.Contains("VIP");
+            _camera = Camera.main;
         }
 
         private void Update()
         {
             if (!_canFly) return;
             UpdateFuel();
+            CheckIfOffscreen();
             if (_currentPoint != Vector3.zero) SmoothRotation();
             if (_usePath) FlyAlongPath();
             else transform.position += transform.up * (Time.deltaTime * speed);
@@ -188,6 +194,7 @@ namespace Ship
         {
             if (other.collider.CompareTag(Tags.Ship))
             {
+                SetTooCloseAlert(false);
                 LevelManager.Instance.ShipsCollided(transform.position);
                 _canFly = false;
                 gameObject.SetActive(false);
@@ -213,6 +220,7 @@ namespace Ship
                     if(_vip) LevelManager.Instance.GameOver("The VIP landed on the wrong pad!");
                 }
                 // Landing logic here
+                SetTooCloseAlert(false);
                 _canFly = false;
                 transform.position = other.transform.position;
                 _lineRenderer.SetPositions(Array.Empty<Vector3>());
@@ -222,18 +230,31 @@ namespace Ship
             }
         }
 
+        private void SetTooCloseAlert(bool tooClose)
+        {
+            if (tooClose)
+            {
+                tooCloseAlert.SetActive(true);
+                AudioManager.Instance.Play("shipClose");
+            }
+            else
+            {
+                tooCloseAlert.SetActive(false);
+                AudioManager.Instance.Stop("shipClose");
+            }
+            
+        }
+
         private void OnTriggerEnter2D(Collider2D other)
         {
             if(!other.CompareTag(Tags.Ship) || !_canFly) return;
-            tooCloseAlert.SetActive(true);
-            AudioManager.Instance.Play("shipClose");
+            SetTooCloseAlert(true);
         }
         
         private void OnTriggerExit2D(Collider2D other)
         {
             if(!other.CompareTag(Tags.Ship) || !_canFly) return;
-            tooCloseAlert.SetActive(false);
-            AudioManager.Instance.Stop("shipClose");
+            SetTooCloseAlert(false);
         }
 
         private void DestroyShip()
@@ -243,17 +264,43 @@ namespace Ship
             Destroy(gameObject);
         }
 
-        void OnBecameInvisible()
+        private void CheckIfOffscreen()
         {
-            ResetPath();
-            var randX = Random.Range(-20f, 20f);
-            var randy = Random.Range(-20f, 20f);
-            var up = Vector3.zero - transform.position;;
-            up.x += randX;
-            up.y += randy;
-            transform.up = up;
+            Vector3 viewportPos = _camera.WorldToViewportPoint(transform.position);
+
+            // Check if the ship has entered the screen for the first time
+            if (!_hasEnteredScreen)
+            {
+                if (viewportPos.x > 0 && viewportPos.x < 1 && viewportPos.y > 0 && viewportPos.y < 1)
+                {
+                    _hasEnteredScreen = true; // Mark that the ship has entered the screen
+                }
+                return; // Ignore offscreen check until the ship has entered the screen
+            }
+
+            // Check if the ship is outside the visible screen area after entering the screen
+            if (viewportPos.x < -boundaryBuffer || viewportPos.x > 1 + boundaryBuffer ||
+                viewportPos.y < -boundaryBuffer || viewportPos.y > 1 + boundaryBuffer)
+            {
+                HandleOffscreen();
+            }
         }
 
+        private void HandleOffscreen()
+        {
+            ResetPath();
+
+            // Randomize a new direction to rotate back on screen
+            var randX = Random.Range(-20f, 20f);
+            var randY = Random.Range(-20f, 20f);
+            Vector3 up = Vector3.zero - transform.position;
+            up.x += randX;
+            up.y += randY;
+
+            // Rotate the ship back towards the screen
+            transform.up = up;
+        }
+        
         public void AddFinalPoint(Vector3 point)
         {
             _path.Add(point);

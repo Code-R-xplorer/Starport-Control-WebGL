@@ -1,5 +1,6 @@
 ﻿using Managers;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Utilities;
 
 namespace Ship
@@ -38,6 +39,12 @@ namespace Ship
         {
             if (!cancel)
             {
+                // Check if the pointer is over a UI element before performing raycast
+                if (EventSystem.current.IsPointerOverGameObject())
+                {
+                    return; // Ignore input if the click is on UI
+                }
+                
                 var rayHit = Physics2D.GetRayIntersection(_camera.ScreenPointToRay(InputManager.Instance.Position));
                 if (!rayHit)
                 {
@@ -46,13 +53,22 @@ namespace Ship
                 }
                 if (rayHit.collider.CompareTag(Tags.Ship))
                 {
-                    _selectedShipController = rayHit.transform.GetComponent<ShipController>();
-                    _recordPath = true;
+                    // Check if the ship is visible on screen before selecting it
+                    var selectedShipRenderer = rayHit.transform.GetComponent<Renderer>();
+                    if (selectedShipRenderer != null && selectedShipRenderer.isVisible)
+                    {
+                        _selectedShipController = rayHit.transform.GetComponent<ShipController>();
+                        _recordPath = true;
 
-                    var pos = _camera.ScreenToWorldPoint(InputManager.Instance.Position);
-                    pos.z = 0;
-                    _selectedShipController.StartPath(pos);
-                    _lastRecordedPosition = pos; // Set the first position
+                        var pos = _camera.ScreenToWorldPoint(InputManager.Instance.Position);
+                        pos.z = 0;
+                        _selectedShipController.StartPath(pos);
+                        _lastRecordedPosition = pos; // Set the first position
+                    }
+                    else
+                    {
+                        AudioManager.Instance.PlayOneShotWithRandomPitch("error", 0.8f, 1.2f);
+                    }
                 }
                 else
                 {
