@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Ship;
+using Unity.Mathematics;
+using UnityEditor.Searcher;
 using UnityEngine;
 using Utilities;
 using Random = UnityEngine.Random;
@@ -15,6 +18,7 @@ namespace Managers
         [SerializeField] private float timeBetweenSpawns;
 
         [SerializeField] private ShipSpawner shipSpawner;
+        [SerializeField] private GameObject explosionEffect;
 
         private int _shipsLanded;
         private float _currentTimeBetweenSpawns;
@@ -22,6 +26,7 @@ namespace Managers
         private int _spawnedShips;
 
         private List<LandingPad> _landingPads;
+        private bool _shipsCollided;
 
         public ShipSpawner ShipSpawner => shipSpawner;
 
@@ -34,7 +39,7 @@ namespace Managers
         {
             Time.timeScale = 1f;
             InputManager.Instance.AllowInput(true);
-            shipSpawner.SetupSpawner(totalShipsToSpawn, timeBetweenSpawns);
+            shipSpawner.SetupSpawner(totalShipsToSpawn, timeBetweenSpawns, this);
             _landingPads = new List<LandingPad>();
             foreach (var pad in  GameObject.FindGameObjectsWithTag(Tags.Pad))
             {
@@ -56,7 +61,22 @@ namespace Managers
             if (_shipsLanded == totalShipsToSpawn) GameWin();
         }
 
+        public void ShipsCollided(Vector3 position)
+        {
+            if(_shipsCollided) return;
+            _shipsCollided = true;
+            Instantiate(explosionEffect, position, Quaternion.identity);
+            StartCoroutine(ShipsCollide());
+            return;
 
+            IEnumerator ShipsCollide()
+            {
+                AudioManager.Instance.PlayOneShot("shipCrash");
+                yield return new WaitForSeconds(0.5f);
+                GameOver("Two ships collided!");
+            }
+        }
+        
         private void GameWin()
         {
             // Show Game Win UI

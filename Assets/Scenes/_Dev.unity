@@ -3790,8 +3790,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ships:
-  - {fileID: 4482783200738683513, guid: 6053938f17c4d204e811a2c590d67f55, type: 3}
-  - {fileID: 459969664393124179, guid: b64d6babb449a9941830debd5df0a937, type: 3}
+  - {fileID: 3985902124489219544, guid: 436816f1fb0bb7e429bae167325420e7, type: 3}
 --- !u!61 &788134502
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -7994,7 +7993,7 @@ GameObject:
   - component: {fileID: 1970199155}
   - component: {fileID: 1970199156}
   m_Layer: 0
-  m_Name: Game Manager
+  m_Name: Level Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8027,9 +8026,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de2390f70c7342479360ecb17fdf4e39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalShipsToSpawn: 5
+  totalShipsToSpawn: 2
   timeBetweenSpawns: 0.5
   shipSpawner: {fileID: 788134501}
+  explosionEffect: {fileID: 858909745809713163, guid: 7f8ea5e8b5a28d546b50bbb5ef42103e, type: 3}
 --- !u!1 &2080378350
 GameObject:
   m_ObjectHideFlags: 0

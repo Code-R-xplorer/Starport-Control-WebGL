@@ -12,7 +12,7 @@ namespace Ship
         private bool _recordPath;
         private Camera _camera;
 
-        private ShipController _selectedShipController;
+        private ShipControllerNew _selectedShipController;
         
         private void Start()
         {
@@ -45,7 +45,7 @@ namespace Ship
                 }
                 if (rayHit.collider.CompareTag(Tags.Ship))
                 {
-                    _selectedShipController = rayHit.transform.GetComponent<ShipController>();
+                    _selectedShipController = rayHit.transform.GetComponent<ShipControllerNew>();
                     _recordPath = true;
                     _currentRecordInterval = recordInterval;
                     var pos = _camera.ScreenToWorldPoint(InputManager.Instance.Position);

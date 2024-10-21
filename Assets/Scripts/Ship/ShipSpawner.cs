@@ -23,16 +23,19 @@ namespace Ship
         private bool _canSpawnVip = true;
         
         public bool VipSpawned { get; private set; }
+        
+        private LevelManager _levelManager;
 
         private void Start()
         {
             _camera = Camera.main;
         }
 
-        public void SetupSpawner(int totalShips, float timeBetweenSpawns)
+        public void SetupSpawner(int totalShips, float timeBetweenSpawns, LevelManager levelManager)
         {
             _totalShipsToSpawn = totalShips;
             _timeBetweenSpawns = timeBetweenSpawns;
+            _levelManager = levelManager;
             _currentTimeBetweenSpawns = _timeBetweenSpawns;
             _canSpawnShips = true;
             _canSpawnShip = true;
@@ -86,61 +89,28 @@ namespace Ship
             switch (r)
             {
                 case 0:
-                    SpawnAtTopEdge();
+                    SpawnAtEdge(new Vector2(0, 0), Random.Range(0f, 1f), -1);
                     break;
                 case 1:
-                    SpawnAtBottomEdge();
+                    SpawnAtEdge(new Vector2(0, 1), Random.Range(0f, 1f), 1);
                     break;
                 case 2:
-                    SpawnAtLeftEdge();
+                    SpawnAtEdge(new Vector2(0, 0),-1, Random.Range(0f, 1f));
                     break;
                 case 3:
-                    SpawnAtRightEdge();
+                    SpawnAtEdge(new Vector2(1, 0),1, Random.Range(0f, 1f));
                     break;
             }
         }
 
-        private void SpawnAtRightEdge()
+        private void SpawnAtEdge(Vector2 startPos, float x, float y)
         {
-            Vector2 spawnPosition = _camera.ViewportToWorldPoint(new Vector2(1, 0f));
+            Vector2 spawnPosition = _camera.ViewportToWorldPoint(startPos);
             
-            spawnPosition.x += 1;
+            spawnPosition.x += x;
             
-            spawnPosition.y += Random.Range(0f, 1f);
+            spawnPosition.y += y;
             
-            Instantiate(_ship, spawnPosition, Quaternion.identity);
-        }
-        
-        private void SpawnAtLeftEdge()
-        {
-            Vector2 spawnPosition = _camera.ViewportToWorldPoint(new Vector2(0f, 0f));
-            
-            spawnPosition.x -= 1;
-            
-            spawnPosition.y += Random.Range(0f, 1f);
-            
-            Instantiate(_ship, spawnPosition, Quaternion.identity);
-        }
-        
-        private void SpawnAtTopEdge()
-        {
-            Vector2 spawnPosition = _camera.ViewportToWorldPoint(new Vector2(0, 0f));
-            
-            spawnPosition.y -= 1;
-            
-            spawnPosition.x += Random.Range(0f, 1f);
-            
-            Instantiate(_ship, spawnPosition, Quaternion.identity);
-        }
-        
-        private void SpawnAtBottomEdge()
-        {
-            Vector2 spawnPosition = _camera.ViewportToWorldPoint(new Vector2(0, 1f));
-            
-            spawnPosition.y += 1;
-            
-            spawnPosition.x += Random.Range(0f, 1f);
-
             Instantiate(_ship, spawnPosition, Quaternion.identity);
         }
 
