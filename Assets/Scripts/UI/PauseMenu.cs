@@ -2,7 +2,6 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 namespace UI

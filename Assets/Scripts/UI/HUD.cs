@@ -1,6 +1,4 @@
-﻿using System;
-using Managers;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

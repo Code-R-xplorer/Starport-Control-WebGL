@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using Utilities;
+﻿using UnityEngine;
 
 namespace Ship
 {

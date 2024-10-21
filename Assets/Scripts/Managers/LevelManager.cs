@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Ship;
-using Unity.Mathematics;
-using UnityEditor.Searcher;
 using UnityEngine;
 using Utilities;
 using Random = UnityEngine.Random;
