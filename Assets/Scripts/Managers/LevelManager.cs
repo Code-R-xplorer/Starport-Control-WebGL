@@ -102,6 +102,11 @@ namespace Managers
         public void PickRandomPad()
         {
             var r = Random.Range(0, _landingPads.Count);
+            if (_landingPads[r].Occupied)
+            {
+                PickRandomPad();
+                return;
+            }
             _landingPads[r].SetAsVip();
         }
     }

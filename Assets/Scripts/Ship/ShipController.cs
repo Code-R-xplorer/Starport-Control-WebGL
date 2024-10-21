@@ -46,6 +46,7 @@ namespace Ship
         private bool _fuelEmpty;
 
         private bool _waitingForPath;
+        private LandingPad _landingPad;
         
         
         private void Start()
@@ -194,12 +195,13 @@ namespace Ship
 
             if (other.collider.CompareTag(Tags.Pad))
             {
-                var pad = other.gameObject.GetComponent<LandingPad>();
-                if (pad.VipPad)
+                _landingPad = other.gameObject.GetComponent<LandingPad>();
+                _landingPad.ShipLanding(true);
+                if (_landingPad.VipPad)
                 {
                     if (_vip)
                     {
-                        pad.VipLanded();
+                        _landingPad.VipLanded();
                     }
                     else
                     {
@@ -237,6 +239,7 @@ namespace Ship
         private void DestroyShip()
         {
             LevelManager.Instance.ShipLanded(_vip);
+            _landingPad.ShipLanding(false);
             Destroy(gameObject);
         }
 
