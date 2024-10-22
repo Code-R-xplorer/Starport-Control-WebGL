@@ -96,6 +96,26 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: eb061bf7e1ac3164a839bf42c3d15268, type: 3}
+    - target: {fileID: 6982399387577671733, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
+      propertyPath: vip
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6982399387577671733, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
+      propertyPath: speed
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6982399387577671733, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
+      propertyPath: rotationSpeed
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6982399387577671733, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
+      propertyPath: fuelDecreaseRate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6982399387577671733, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
+      propertyPath: fuelDecreaseAmount
+      value: 0.03
+      objectReference: {fileID: 0}
     - target: {fileID: 7794768512182333955, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
       propertyPath: m_IsActive
       value: 0

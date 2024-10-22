@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+using Random = UnityEngine.Random;
 
 // AudioManager class is responsible for managing audio playback in the scene.
 namespace Managers
@@ -265,6 +266,46 @@ namespace Managers
                 // Play the audio clip once with the given volume if the source is found.
                 source?.Play();
             }
+        }
+        
+        public void PlayOneShotWithRandomPitch(string name, float minPitch, float maxPitch)
+        {
+            // Check if the specified AudioSource exists in the audioSources dictionary.
+            if (audioSources.TryGetValue(name, out var source))
+            {
+                var oldPitch = source.pitch;
+                
+                source.pitch = Random.Range(minPitch, maxPitch);
+                
+                // Play the audio clip once with the given volume if the source is found.
+                source.PlayOneShot(source.clip, source.volume);
+                
+                StartCoroutine(ResetPitch(source, oldPitch));
+            }
+        }
+
+        public void PlayWithRandomPitch(string name, float minPitch, float maxPitch)
+        {
+            // Check if the specified AudioSource exists in the audioSources dictionary.
+            if (audioSources.TryGetValue(name, out var source))
+            {
+                if(source.isPlaying) return;
+                
+                var oldPitch = source.pitch;
+                
+                source.pitch = Random.Range(minPitch, maxPitch);
+                
+                // Play the audio clip once with the given volume if the source is found.
+                source.Play();
+                
+                StartCoroutine(ResetPitch(source, oldPitch));
+            }
+        }
+
+        private IEnumerator ResetPitch(AudioSource source, float oldPitch)
+        {
+            yield return new WaitForSeconds(source.clip.length);
+            source.pitch = oldPitch;
         }
 
         public void StopAllAudio()

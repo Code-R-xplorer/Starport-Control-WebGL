@@ -4483,7 +4483,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41d34d12d52845218c199cbfad073444, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  recordInterval: 0.01
+  recordDistance: 0.5
 --- !u!1 &1707446654
 GameObject:
   m_ObjectHideFlags: 0
@@ -4779,6 +4779,7 @@ MonoBehaviour:
   totalShipsToSpawn: 15
   timeBetweenSpawns: 0.2
   shipSpawner: {fileID: 786793687}
+  explosionEffect: {fileID: 858909745809713163, guid: 7f8ea5e8b5a28d546b50bbb5ef42103e, type: 3}
 --- !u!1 &1930439483
 GameObject:
   m_ObjectHideFlags: 0

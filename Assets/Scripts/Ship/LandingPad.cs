@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using Utilities;
+﻿using UnityEngine;
 
 namespace Ship
 {
@@ -12,10 +10,16 @@ namespace Ship
         private readonly int _baseState = Animator.StringToHash("Base State");
 
         public bool VipPad { get; private set; }
+        public bool Occupied { get; private set; }
 
         private void Start()
         {
             _animator = GetComponent<Animator>();
+        }
+
+        public void ShipLanding(bool landing)
+        {
+            Occupied = landing;
         }
 
         public void SetAsVip()

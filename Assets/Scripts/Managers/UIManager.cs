@@ -1,7 +1,6 @@
-﻿using System;
-using TMPro;
-using UnityEngine;
+﻿using TMPro;
 using UI;
+using UnityEngine;
 
 namespace Managers
 {

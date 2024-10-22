@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 965220984820292951, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
       propertyPath: m_Name
-      value: Small_Ship Variant
+      value: Small_Ship
       objectReference: {fileID: 0}
     - target: {fileID: 1035610907810171295, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -61,6 +61,22 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1046531630003560982, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
+      propertyPath: fuelDecreaseAmount
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 6982399387577671733, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
+      propertyPath: speed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6982399387577671733, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
+      propertyPath: rotationSpeed
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6982399387577671733, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
+      propertyPath: fuelDecreaseRate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6982399387577671733, guid: a7916b33c55725a4da2eea72e3ea794d, type: 3}
       propertyPath: fuelDecreaseAmount
       value: 0.05
       objectReference: {fileID: 0}

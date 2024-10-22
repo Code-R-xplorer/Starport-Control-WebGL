@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Managers;
 using UnityEngine;
 using Utilities;
@@ -11,24 +10,33 @@ namespace Ship
 {
     public class ShipController : MonoBehaviour
     {
+        [Header("Sprites")]
         [SerializeField] private GameObject indicator;
         [SerializeField] private GameObject tooCloseAlert;
         [SerializeField] private Transform trails;
+        [Header("Movement")]
         [SerializeField] private float speed;
+        [SerializeField] private float rotationSpeed;
+        [Header("Fuel")]
         [SerializeField] private float fuelDecreaseRate;
         [SerializeField] private float fuelDecreaseAmount;
         [SerializeField] private Color fullFuelColor;
         [SerializeField] private Color emptyFuelColor;
+        [Header("Path")]
+        [SerializeField] private Material dottedLineMaterial;
+        [SerializeField] private Material solidLineMaterial;
+        [SerializeField] private float dottedLineWidth;
+        [SerializeField] private float solidLineWidth;
+        [Header("Screen")]
+        [SerializeField] private float boundaryBuffer = 0.05f; // Extra space to trigger the off-screen event
+        
+        private bool _vip;
 
-        [SerializeField] private bool vip;
-
-        private Rigidbody2D _rigidbody;
         private LineRenderer _lineRenderer;
 
         private List<Vector3> _path;
         private Vector3 _currentPoint;
         private bool _usePath;
-        private bool _spawned = true;
         private bool _canFly; 
 
         private ShipAnimation _shipAnimation;
@@ -38,11 +46,15 @@ namespace Ship
         private float _currentDecreaseTime;
         private float _fuel = 1f;
         private bool _fuelEmpty;
-        
-        
+
+        private bool _waitingForPath;
+        private LandingPad _landingPad;
+        private Camera _camera;
+        private bool _hasEnteredScreen;
+
+
         private void Start()
         {
-            _rigidbody = GetComponent<Rigidbody2D>();
             _lineRenderer = GetComponent<LineRenderer>();
             _shipAnimation = GetComponent<ShipAnimation>();
             _shipAnimation.OnLandingFinished += DestroyShip;
@@ -50,10 +62,6 @@ namespace Ship
             {
                 Destroy(indicator);
                 _canFly = true;
-            };
-            _shipAnimation.OnExplosionFinished += () =>
-            {
-                LevelManager.Instance.GameOver("Two ships collided!");
             };
             transform.up = Vector3.zero - transform.position;
 
@@ -65,32 +73,62 @@ namespace Ship
             }
 
             _currentDecreaseTime = fuelDecreaseRate;
-        }
-
-        private void FixedUpdate()
-        {
-            if(!_canFly) return;
-            _rigidbody.velocity = transform.up * (speed * Time.deltaTime);
-            if(!_usePath) return;
-            _path[0] = transform.position;
-            _lineRenderer.SetPosition(0, _path[0]);
-            if (Vector3.Distance(_currentPoint, transform.position) < 0.1f)
-            {
-                TravelToNextPoint();
-            }
+            _vip = gameObject.name.Contains("VIP");
+            _camera = Camera.main;
         }
 
         private void Update()
         {
             if (!_canFly) return;
+            UpdateFuel();
+            CheckIfOffscreen();
+            if (_currentPoint != Vector3.zero) SmoothRotation();
+            if (_usePath) FlyAlongPath();
+            else transform.position += transform.up * (Time.deltaTime * speed);
+        }
+
+        private void SmoothRotation()
+        {
+            // Calculate the direction to the current point
+            Vector3 targetDirection = (_currentPoint - transform.position).normalized;
+
+            // Smoothly interpolate between current direction (transform.up) and target direction
+            Vector3 smoothDirection = Vector3.Slerp(transform.up, targetDirection, rotationSpeed * Time.deltaTime);
+
+            // Set the new smoothed direction as the ship's up direction
+            transform.up = smoothDirection;
+        }
+
+        private void FlyAlongPath()
+        {
+            if (_path.Count < 3 && _waitingForPath)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, InputManager.Instance.Position, Time.deltaTime * speed);
+                return;
+            }
+            
+            _waitingForPath = false;
+            
+            _path[0] = transform.position;
+            _lineRenderer.SetPosition(0, transform.position);
+            if (Vector3.Distance(_currentPoint, transform.position) < 0.1f)
+            {
+                TravelToNextPoint();
+            }
+            else transform.position = Vector3.MoveTowards(transform.position, _currentPoint, Time.deltaTime * speed);
+        }
+
+        private void UpdateFuel()
+        {
             _currentDecreaseTime -= Time.deltaTime;
             if (_currentDecreaseTime <= 0)
             {
                 _fuel -= fuelDecreaseAmount;
                 if (_fuel <= 0)
                 {
-                    _fuelEmpty = true;
                     _fuel = 0;
+                    _canFly = false;
+                    LevelManager.Instance.GameOver("A ship ran out of fuel!");
                 }
                 _currentDecreaseTime = fuelDecreaseRate;
                 var trailColour = Color.Lerp(emptyFuelColor, fullFuelColor, _fuel);
@@ -98,12 +136,6 @@ namespace Ship
                 {
                     spriteRenderer.color = trailColour;
                 }
-            }
-
-            if (_fuelEmpty)
-            {
-                _canFly = false;
-                LevelManager.Instance.GameOver("A ship ran out of fuel!");
             }
         }
 
@@ -114,27 +146,41 @@ namespace Ship
                 transform.position,
                 point
             };
-            TravelToNextPoint();
+            _currentPoint = point;
+            transform.up = _currentPoint - transform.position;
             _usePath = true;
+            _waitingForPath = true;
+            SetLineAppearance(dottedLineMaterial, dottedLineWidth);
+        }
+
+        private void SetLineAppearance(Material material, float lineWidth)
+        {
+            _lineRenderer.material = material;
+            _lineRenderer.startWidth = lineWidth;
+            _lineRenderer.endWidth = lineWidth;
         }
 
         private void TravelToNextPoint()
         {
             if (_path.Count == 1)
             {
-                _lineRenderer.SetPositions(Array.Empty<Vector3>());
-                _lineRenderer.positionCount = 0;
-                _usePath = false;
-                transform.up = _currentPoint - transform.position; 
+                ResetPath();
                 return;
             }
             
             _currentPoint = _path[1];
             _path.Remove(_path[1]);
-
-            transform.up = _currentPoint - transform.position; 
             _lineRenderer.positionCount = _path.Count;
             _lineRenderer.SetPositions(_path.ToArray());
+        }
+
+        private void ResetPath()
+        {
+            _lineRenderer.SetPositions(Array.Empty<Vector3>());
+            _lineRenderer.positionCount = 0;
+            _usePath = false;
+            transform.up = _currentPoint - transform.position; 
+            _currentPoint = Vector3.zero;
         }
 
         public void AddPathPoint(Vector3 point)
@@ -148,24 +194,21 @@ namespace Ship
         {
             if (other.collider.CompareTag(Tags.Ship))
             {
-                Debug.Log("Collided with other ship");
-                // Ship collision logic here
-                AudioManager.Instance.PlayOneShot("shipCrash");
-                _shipAnimation.PlayExplosionAnimation();
+                SetTooCloseAlert(false);
+                LevelManager.Instance.ShipsCollided(transform.position);
                 _canFly = false;
-                tooCloseAlert.SetActive(false);
-                _rigidbody.velocity = Vector2.zero;
+                gameObject.SetActive(false);
             }
 
             if (other.collider.CompareTag(Tags.Pad))
             {
-                Debug.Log("Land at pad");
-                var pad = other.gameObject.GetComponent<LandingPad>();
-                if (pad.VipPad)
+                _landingPad = other.gameObject.GetComponent<LandingPad>();
+                _landingPad.ShipLanding(true);
+                if (_landingPad.VipPad)
                 {
-                    if (vip)
+                    if (_vip)
                     {
-                        pad.VipLanded();
+                        _landingPad.VipLanded();
                     }
                     else
                     {
@@ -174,60 +217,96 @@ namespace Ship
                 }
                 else
                 {
-                    if(vip) LevelManager.Instance.GameOver("The VIP landed on the wrong pad!");
+                    if(_vip) LevelManager.Instance.GameOver("The VIP landed on the wrong pad!");
                 }
                 // Landing logic here
+                SetTooCloseAlert(false);
                 _canFly = false;
-                _rigidbody.simulated = false;
                 transform.position = other.transform.position;
                 _lineRenderer.SetPositions(Array.Empty<Vector3>());
                 _lineRenderer.positionCount = 0;
                 _shipAnimation.PlayLandingAnimation();
-                AudioManager.Instance.PlayOneShot("shipLand");
+                AudioManager.Instance.PlayOneShotWithRandomPitch("shipLand", 0.9f, 1.1f);
             }
+        }
+
+        private void SetTooCloseAlert(bool tooClose)
+        {
+            if (tooClose)
+            {
+                tooCloseAlert.SetActive(true);
+                AudioManager.Instance.Play("shipClose");
+            }
+            else
+            {
+                tooCloseAlert.SetActive(false);
+                AudioManager.Instance.Stop("shipClose");
+            }
+            
         }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
             if(!other.CompareTag(Tags.Ship) || !_canFly) return;
-            tooCloseAlert.SetActive(true);
-            AudioManager.Instance.Play("shipClose");
+            SetTooCloseAlert(true);
         }
         
         private void OnTriggerExit2D(Collider2D other)
         {
             if(!other.CompareTag(Tags.Ship) || !_canFly) return;
-            tooCloseAlert.SetActive(false);
-            AudioManager.Instance.Stop("shipClose");
+            SetTooCloseAlert(false);
         }
 
         private void DestroyShip()
         {
-            LevelManager.Instance.ShipLanded(vip);
+            LevelManager.Instance.ShipLanded(_vip);
+            _landingPad.ShipLanding(false);
             Destroy(gameObject);
         }
 
-        void OnBecameInvisible()
+        private void CheckIfOffscreen()
         {
-            if (_spawned)
+            Vector3 viewportPos = _camera.WorldToViewportPoint(transform.position);
+
+            // Check if the ship has entered the screen for the first time
+            if (!_hasEnteredScreen)
             {
-                _spawned = false;
-                return;
+                if (viewportPos.x > 0 && viewportPos.x < 1 && viewportPos.y > 0 && viewportPos.y < 1)
+                {
+                    _hasEnteredScreen = true; // Mark that the ship has entered the screen
+                }
+                return; // Ignore offscreen check until the ship has entered the screen
             }
-            Debug.Log("Out of View");
-            // var rot = transform.rotation;
-            var randX = Random.Range(-0.5f, 0.5f);
-            var randy = Random.Range(-0.5f, 0.5f);
-            var up = transform.up;
-            up *= -1;
-            up.x += randX;
-            up.y += randy;
-            transform.up = up;
+
+            // Check if the ship is outside the visible screen area after entering the screen
+            if (viewportPos.x < -boundaryBuffer || viewportPos.x > 1 + boundaryBuffer ||
+                viewportPos.y < -boundaryBuffer || viewportPos.y > 1 + boundaryBuffer)
+            {
+                HandleOffscreen();
+            }
         }
 
-        public bool IsVip()
+        private void HandleOffscreen()
         {
-            return vip;
+            ResetPath();
+
+            // Randomize a new direction to rotate back on screen
+            var randX = Random.Range(-20f, 20f);
+            var randY = Random.Range(-20f, 20f);
+            Vector3 up = Vector3.zero - transform.position;
+            up.x += randX;
+            up.y += randY;
+
+            // Rotate the ship back towards the screen
+            transform.up = up;
+        }
+        
+        public void AddFinalPoint(Vector3 point)
+        {
+            _path.Add(point);
+            _lineRenderer.positionCount = _path.Count;
+            _lineRenderer.SetPositions(_path.ToArray());
+            SetLineAppearance(solidLineMaterial, solidLineWidth);
         }
     }
 }
